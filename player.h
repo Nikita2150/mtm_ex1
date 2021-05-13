@@ -6,6 +6,6 @@
 typedef struct player_t* Player;
 
 Player playerCreate();
-void playerDestroy();
+void playerDestroy(Player player);
 
 #endif //_PLAYER_H
