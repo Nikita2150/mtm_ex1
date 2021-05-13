@@ -204,32 +204,7 @@ ChessResult chessAddGame(ChessSystem chess, int tournament_id, int first_player,
     free(tournament_id_key);
     tournament_id_key = NULL;
     
-    int* tournament_iterator = mapGetFirst(chess->tournaments);
-    while(tournament_iterator != NULL)
-    {
-        if(tournamentContains(mapGet(chess->tournaments, tournament_iterator), first_player, second_player))
-        {
-            return CHESS_GAME_ALREADY_EXISTS;
-        }
-        tournament_iterator = mapGetNext(chess->tournaments);
-    }
-
-    if(play_time < 0)
-    {
-        return CHESS_INVALID_PLAY_TIME;
-    }
-
-    if(chess->players == NULL)
-    {
-        chess->players = mapCreate(playerCopy, copyInt, playerDestroy, freeInt, compareInts);
-        if(chess->players == NULL)
-        {
-            chessDestroy(chess);
-            return MAP_OUT_OF_MEMORY;
-        }
-    }
-
-    Player first_player_data, second_player_data;
+        Player first_player_data, second_player_data;
 
     int* first_player_id = intCreate(first_player);
     if(first_player_id == NULL)
@@ -262,6 +237,37 @@ ChessResult chessAddGame(ChessSystem chess, int tournament_id, int first_player,
         chessDestroy(chess);
         return CHESS_OUT_OF_MEMORY;
     }
+
+    if(!(playerGetIsOut(second_player_data) || playerGetIsOut(first_player_data)))
+    {
+        int* tournament_iterator = mapGetFirst(chess->tournaments);
+        while(tournament_iterator != NULL)
+        {
+            if(tournamentContains(mapGet(chess->tournaments, tournament_iterator), first_player, second_player))
+            {
+                return CHESS_GAME_ALREADY_EXISTS;
+            }
+            tournament_iterator = mapGetNext(chess->tournaments);
+        }
+    }
+    
+
+    if(play_time < 0)
+    {
+        return CHESS_INVALID_PLAY_TIME;
+    }
+
+    if(chess->players == NULL)
+    {
+        chess->players = mapCreate(playerCopy, copyInt, playerDestroy, freeInt, compareInts);
+        if(chess->players == NULL)
+        {
+            chessDestroy(chess);
+            return MAP_OUT_OF_MEMORY;
+        }
+    }
+
+
 
     playerAddGame(first_player_data);
     playerAddGame(second_player_data);

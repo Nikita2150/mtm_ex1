@@ -18,5 +18,7 @@ void playerAddTime(Player player, int time);
 
 Player playerCopy(Player player);
 
+bool playerGetIsOut(Player player);
+
 
 #endif //_PLAYER_H

@@ -77,3 +77,8 @@ void playerAddTime(Player player, int time)
 {
     player->play_time += time;
 }
+
+bool playerGetIsOut(Player player)
+{
+    return player->is_out;
+}
