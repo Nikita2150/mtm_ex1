@@ -7,6 +7,7 @@ struct player_t
 {
     int num_of_games;
     int num_of_wins;
+    int nhinhjbhb;
     int play_time;
     bool is_out;
 };
