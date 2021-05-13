@@ -11,7 +11,6 @@ typedef enum{
     DRAW,
 } Winner;
 
-//creating 
 Game gameCreate(int first_player, int second_player, Winner winner, int play_time);
 
 int gameGetFirst_player(Game game);
@@ -22,7 +21,7 @@ int gameSetSecond_player(Game game, int second_to_set);
 
 Winner gameGetWinner(Game game);
 
-int gameGetPlat_time(Game game);
+int gameGetPlay_time(Game game);
 
 
 //
