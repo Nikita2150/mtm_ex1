@@ -35,7 +35,7 @@ void tournamentDestroy(Tournament tournament)
     }
 }
 
-Tournament copyTournament(Tournament tournament)
+Tournament tournamentCopy(Tournament tournament)
 {
     if(tournament == NULL)
     {
@@ -44,3 +44,29 @@ Tournament copyTournament(Tournament tournament)
     Tournament new_tournament = tournamentCreate(tournament->max_games_per_player, tournament->tournament_location);
     return new_tournament; //If = NULL, we'll return NULL
 }
+
+bool tournamentContains(Tournament tournament,int first_player, int second_player)
+{
+    if(tournament == NULL)
+    {
+        return NULL;
+    }
+    return nodeContains(tournament->games, first_player, second_player);
+}
+
+MapResult tournamentAddGame(Tournament tournament, int first_player, int second_player, Winner winner, int play_time)
+{
+    Game new_game = gameCreate(first_player, second_player, winner, play_time);
+    if(new_game == NULL)
+    {
+        return MAP_OUT_OF_MEMORY;
+    }
+    Node new_games_list = nodeAdd(tournament->games, new_game);
+    if(new_games_list == NULL)
+    {
+        return MAP_OUT_OF_MEMORY;
+    }
+    tournament->games = new_games_list;
+    return MAP_SUCCESS;
+}
+

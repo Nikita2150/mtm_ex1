@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "node.h"
 
+
 struct node_t
 {
     Game game;
@@ -67,4 +68,31 @@ void nodeDestroy(Node node)
         gameDestroy(toDelete->game);
         free(toDelete);
     }
+}
+
+bool nodeContains(Node node, int first_player, int second_player)
+{
+    while(node != NULL)
+    {
+        if(gameGetFirst_player(node->game) == first_player &&
+         gameGetSecond_player(node->game) == second_player)
+        {
+            return true;
+        }
+        node = node->next;
+    }
+    return false;  
+}
+
+Node nodeAdd(Node list, Game game)
+{
+    //ASSERT, game != NULL
+    Node new_node = nodeCreate(game);
+    if(new_node == NULL)
+    {
+        return NULL;
+    }
+
+    new_node->next = list;
+    return new_node;
 }

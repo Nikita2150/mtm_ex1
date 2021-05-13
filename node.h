@@ -2,6 +2,7 @@
 #define NODE_H_
 
 #include "game.h"
+#include "chessSystem.h"
 #include <stdbool.h>
 
 typedef struct node_t* Node;
@@ -16,7 +17,9 @@ void nodeSetNext(Node node, Node to_set_next);
 
 bool nodeIsEqual(Node node1, Node node2);
 
+bool nodeContains(Node node, int first_player, int second_player);
 
+Node nodeAdd(Node list, Game game);
 
 void nodeDestroy(Node node); 
 
