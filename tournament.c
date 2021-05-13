@@ -9,7 +9,6 @@ struct tournament_t
     const char* tournament_location;
     
     Node games;
-    Map players;
 };
 
 Tournament tournamentCreate(int max_games_per_player, const char* tournament_location)
@@ -24,7 +23,6 @@ Tournament tournamentCreate(int max_games_per_player, const char* tournament_loc
     new_tournament->tournament_location = tournament_location;
 
     new_tournament->games = NULL; //Empty games node
-    new_tournament->players = NULL;
     return new_tournament;
 }
 
@@ -33,7 +31,6 @@ void tournamentDestroy(Tournament tournament)
     if(tournament != NULL)
     {
         nodeDestroy(tournament->games);
-        mapDestroy(tournament->players);
         free(tournament);
     }
 }

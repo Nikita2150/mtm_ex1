@@ -1,11 +1,13 @@
 #include "chessSystem.h"
 #include "map.h"
 #include "tournament.h"
+#include "player.h"
 
 
 struct chess_system_t
 {
     Map tournaments; // Key - tournament_id, Data - tournament
+    Map players;
 };
 
 // FUNCTIONS FOR MAP
@@ -47,6 +49,7 @@ ChessSystem chessCreate()
     }
 
     new_chess_system->tournaments = NULL;
+    new_chess_system->players = NULL;
 
     return new_chess_system;
 }
@@ -56,6 +59,7 @@ void chessDestroy(ChessSystem chess)
     if(chess != NULL)
     {
         tournamentDestroy(chess->tournaments);
+        mapDestroy(chess->players);
         free(chess);
     }
 }
@@ -71,7 +75,7 @@ ChessResult chessAddTournament(ChessSystem chess, int tournament_id, int max_gam
     {
         return CHESS_INVALID_ID;
     }
-    if(tournament_location == "")//Only empty string?
+    if(tournament_location == "")//Is this the only empty string?
     {
         return CHESS_INVALID_LOCATION;
     }
@@ -82,14 +86,13 @@ ChessResult chessAddTournament(ChessSystem chess, int tournament_id, int max_gam
         chess->tournaments = mapCreate(copyTournament, copyInt, tournamentDestroy, freeInt, compareInts);
     }
 
-    //////NOT SURE ABOUT THIS
     int* tour_id = malloc(sizeof(*tour_id));
     if(tour_id == NULL)
     {
-        //EXIT PROGRAM, BUT HOW?!!!?
-        return CHESS_OUT_OF_MEMORY; // not needed
+        chessDestroy(chess);
+        return CHESS_OUT_OF_MEMORY; 
     }
-    /////////////////////////
+    
     *tour_id = tournament_id;
     if(mapContains(chess->tournaments, tour_id))
     {
@@ -100,8 +103,8 @@ ChessResult chessAddTournament(ChessSystem chess, int tournament_id, int max_gam
     Tournament new_tournament = tournamentCreate(max_games_per_player, tournament_location);
     if(new_tournament == NULL)
     {
-        //EXIT PROGRAM, BUT HOW?!!!?
-        return CHESS_OUT_OF_MEMORY; // not needed
+        chessDestroy(chess);
+        return CHESS_OUT_OF_MEMORY;
     }
     
     switch(mapPut(chess->tournaments, tour_id, new_tournament))
@@ -111,11 +114,27 @@ ChessResult chessAddTournament(ChessSystem chess, int tournament_id, int max_gam
         case MAP_NULL_ARGUMENT:
             return CHESS_NULL_ARGUMENT;
         case MAP_OUT_OF_MEMORY:
-            //EXIT PROGRAM, BUT HOW?!!!?
-            return CHESS_OUT_OF_MEMORY; // not needed
+            chessDestroy(chess);
+            return CHESS_OUT_OF_MEMORY;
         case MAP_SUCCESS:
             return CHESS_SUCCESS;
     }
     return CHESS_SUCCESS;
         
+}
+
+
+ChessResult chessAddGame(ChessSystem chess, int tournament_id, int first_player, int second_player, Winner winner, int play_time)
+{
+    int* first_player_id = malloc(sizeof(*first_player_id));
+    Player first_player_d, second_player_d;
+    if(first_player_id == NULL)
+    {
+        chessDestroy(chess);
+        return CHESS_OUT_OF_MEMORY;
+    }
+    if(mapContains(chess->players, first_player_id))
+    {
+        
+    }
 }
