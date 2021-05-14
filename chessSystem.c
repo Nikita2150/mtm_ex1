@@ -203,14 +203,10 @@ ChessResult chessAddGame(ChessSystem chess, int tournament_id, int first_player,
 
     if(!(playerGetIsOut(second_player_data) || playerGetIsOut(first_player_data)))
     {
-        int* tournament_iterator = mapGetFirst(chess->tournaments);
-        while(tournament_iterator != NULL)
+        if(tournamentContains(mapGet(chess->tournaments, this_tournament), first_player, second_player)
+            || tournamentContains(mapGet(chess->tournaments, this_tournament), second_player, first_player))
         {
-            if(tournamentContains(mapGet(chess->tournaments, tournament_iterator), first_player, second_player))
-            {
-                return CHESS_GAME_ALREADY_EXISTS;
-            }
-            tournament_iterator = mapGetNext(chess->tournaments);
+            return CHESS_GAME_ALREADY_EXISTS;
         }
     }
     

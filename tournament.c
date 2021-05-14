@@ -45,11 +45,11 @@ Tournament tournamentCopy(Tournament tournament)
     return new_tournament; //If = NULL, we'll return NULL
 }
 
-bool tournamentContains(Tournament tournament,int first_player, int second_player)
+bool tournamentContains(Tournament tournament, int first_player, int second_player)
 {
     if(tournament == NULL)
     {
-        return NULL;
+        return false;
     }
     return nodeContains(tournament->games, first_player, second_player);
 }
