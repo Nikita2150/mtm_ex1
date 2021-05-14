@@ -56,6 +56,10 @@ bool tournamentContains(Tournament tournament, int first_player, int second_play
 
 MapResult tournamentAddGame(Tournament tournament, int first_player, int second_player, Winner winner, int play_time)
 {
+    if(tournament == NULL)
+    {
+        return MAP_NULL_ARGUMENT;
+    }
     Game new_game = gameCreate(first_player, second_player, winner, play_time);
     if(new_game == NULL)
     {
@@ -72,5 +76,26 @@ MapResult tournamentAddGame(Tournament tournament, int first_player, int second_
 
 int tournamentGetMaxGamesPerPlayer(Tournament tournament)
 {
+    if(tournament == NULL)
+    {
+        return -1;
+    }
     return tournament->max_games_per_player;
+}
+
+Node getGamesOfTournament(Tournament tournament)
+{
+    if(tournament == NULL)
+    {
+        return NULL;
+    }
+    return tournament->games;
+}
+
+void tournamentRemoveFirstGame(Tournament tournament)
+{
+    if(tournament != NULL)
+    {
+        tournament->games = removeFirstNode(tournament->games);
+    }
 }

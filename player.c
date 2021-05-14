@@ -87,3 +87,25 @@ int playerNumOfGames(Player player)
 {
     return player->num_of_games;
 }
+
+void updateRemovedGame(Player player, Winner winner, bool first, int play_time)
+{
+    if(player == NULL)
+    {
+        return;
+    }
+    player->num_of_games--;
+    player->play_time -= play_time;
+    if(winner == DRAW)
+    {
+        player->num_of_draws--;
+    }
+    else if(winner == FIRST_PLAYER && first)
+    {
+        player->num_of_wins--;
+    }
+    else if(winner == SECOND_PLAYER && !first)
+    {
+        player->num_of_wins--;
+    }
+}

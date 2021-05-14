@@ -74,8 +74,8 @@ bool nodeContains(Node node, int first_player, int second_player)
 {
     while(node != NULL)
     {
-        if(gameGetFirst_player(node->game) == first_player &&
-         gameGetSecond_player(node->game) == second_player)
+        if(gameGetFirstPlayer(node->game) == first_player &&
+         gameGetSecondPlayer(node->game) == second_player)
         {
             return true;
         }
@@ -95,4 +95,18 @@ Node nodeAdd(Node list, Game game)
 
     new_node->next = list;
     return new_node;
+}
+
+Node removeFirstNode(Node node)
+{
+    if(node == NULL)
+    {
+        return NULL;
+    }
+    Node temp = node;
+    node = node->next;
+    gameDestroy(temp->game);
+    free(temp);
+
+    return node;
 }

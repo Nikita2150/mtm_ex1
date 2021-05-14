@@ -2,6 +2,7 @@
 #define _PLAYER_H
 
 #include <stdbool.h>
+#include "chessSystem.h"
 
 typedef struct player_t* Player;
 
@@ -22,5 +23,6 @@ bool playerGetIsOut(Player player);
 
 int playerNumOfGames(Player player);
 
+void updateRemovedGame(Player player, Winner winner, bool first, int play_time);
 
 #endif //_PLAYER_H

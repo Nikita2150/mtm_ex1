@@ -1,7 +1,12 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
 #include "chessSystem.h"
 #include "map.h"
 #include "tournament.h"
 #include "player.h"
+#include "node.h"
 
 
 struct chess_system_t
@@ -285,3 +290,44 @@ ChessResult chessAddGame(ChessSystem chess, int tournament_id, int first_player,
     return convertMapResult(chess, tournamentAddGame(this_tournament, first_player, second_player, winner, play_time));
 }
 
+ChessResult chessRemoveTournament(ChessSystem chess, int tournament_id)
+{
+    if(chess == NULL)
+    {
+        return CHESS_NULL_ARGUMENT;
+    }
+    if(tournament_id < 0)
+    {
+        return CHESS_INVALID_ID;
+    }
+    if(!mapContains(chess->tournaments, &tournament_id))
+    {
+        return CHESS_TOURNAMENT_NOT_EXIST;
+    }
+
+    Tournament this_tournament = mapGet(chess->tournaments, &tournament_id);
+
+    Node games = getGamesOfTournament(this_tournament);
+
+    while(games != NULL)
+    {
+        int first_player = gameGetFirstPlayer(games);
+        int second_player = gameGetFirstPlayer(games);
+        //ASSERT: first_player, second_player >= 0
+
+        Player first_player_data = mapGet(chess->players, &first_player);
+        Player second_player_data = mapGet(chess->players, &second_player);
+        //ASSERT: both aren't NULL
+
+        updateRemovedGame(first_player_data, gameGetWinner(games), true, gameGetPlayTime(games));
+        updateremovedGame(second_player_data, gameGetWinner(games), false, gameGetPlayTime(games));
+
+        tournamentRemoveFirstGame(this_tournament);
+
+        games = getGamesOfTournament(this_tournament);
+    }
+
+    mapRemove(chess->tournaments, &tournament_id);
+
+    return CHESS_SUCCESS;
+}

@@ -23,6 +23,8 @@ Node nodeAdd(Node list, Game game);
 
 void nodeDestroy(Node node); 
 
+Node removeFirstNode(Node node);
+
 //setnext
 
 #endif // NODE_H_
