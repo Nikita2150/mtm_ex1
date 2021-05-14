@@ -16,4 +16,6 @@ Tournament tournamentCopy(Tournament tournament);
 
 MapResult tournamentAddGame(Tournament tournament, int first_player, int second_player, Winner winner, int play_time);
 
+int tournamentGetMaxGamesPerPlayer(Tournament tournament);
+
 #endif

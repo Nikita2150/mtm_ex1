@@ -20,5 +20,7 @@ Player playerCopy(Player player);
 
 bool playerGetIsOut(Player player);
 
+int playerNumOfGames(Player player);
+
 
 #endif //_PLAYER_H

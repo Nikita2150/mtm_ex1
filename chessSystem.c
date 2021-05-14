@@ -192,6 +192,11 @@ ChessResult chessAddGame(ChessSystem chess, int tournament_id, int first_player,
         return CHESS_OUT_OF_MEMORY;
     }
 
+    //NOT SURE ABOUT THE PRIORITY OF CHESS_EXCEEDED_GAMES
+    if(playerNumOfGames(first_player_data) >= tournamentGetMaxGamesPerPlayer(this_tournament))
+    {
+        return CHESS_EXCEEDED_GAMES;
+    }
     int* second_player_id = &second_player;
     
     second_player_data = initializePlayer(chess, second_player_id);
@@ -199,6 +204,11 @@ ChessResult chessAddGame(ChessSystem chess, int tournament_id, int first_player,
     {
         chessDestroy(chess);
         return CHESS_OUT_OF_MEMORY;
+    }
+
+    if(playerNumOfGames(second_player_data) >= tournamentGetMaxGamesPerPlayer(this_tournament))
+    {
+        return CHESS_EXCEEDED_GAMES;
     }
 
     if(!(playerGetIsOut(second_player_data) || playerGetIsOut(first_player_data)))

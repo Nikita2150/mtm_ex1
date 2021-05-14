@@ -70,3 +70,7 @@ MapResult tournamentAddGame(Tournament tournament, int first_player, int second_
     return MAP_SUCCESS;
 }
 
+int tournamentGetMaxGamesPerPlayer(Tournament tournament)
+{
+    return tournament->max_games_per_player;
+}

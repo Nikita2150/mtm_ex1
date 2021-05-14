@@ -82,3 +82,8 @@ bool playerGetIsOut(Player player)
 {
     return player->is_out;
 }
+
+int playerNumOfGames(Player player)
+{
+    return player->num_of_games;
+}
