@@ -252,7 +252,7 @@ ChessResult chessAddGame(ChessSystem chess, int tournament_id, int first_player,
     }
     
 
-    if(play_time < 0)
+    if(play_time <= 0)
     {
         return CHESS_INVALID_PLAY_TIME;
     }
