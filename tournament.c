@@ -3,11 +3,13 @@
 #include "node.h"
 #include "map.h"
 
+#define TOURNAMENT_IN_PROGRESS -1
+
 struct tournament_t
 {
     int max_games_per_player;
     const char* tournament_location;
-    
+    int winner_id;
     Node games;
 };
 
@@ -18,7 +20,7 @@ Tournament tournamentCreate(int max_games_per_player, const char* tournament_loc
     {
         return NULL;
     }
-
+    new_tournament->winner_id = TOURNAMENT_IN_PROGRESS;
     new_tournament->max_games_per_player = max_games_per_player;
     new_tournament->tournament_location = tournament_location;
 
@@ -43,6 +45,7 @@ Tournament tournamentCopy(Tournament tournament)
     }
     Tournament new_tournament = tournamentCreate(tournament->max_games_per_player, tournament->tournament_location);
     new_tournament->games = nodeCopy(tournament->games);
+    new_tournament->winner_id = tournament->winner_id;
     return new_tournament; //If = NULL, we'll return NULL
 }
 
