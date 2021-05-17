@@ -1,4 +1,4 @@
-#include "stdlib.h"
+#include <stdlib.h>
 #include "tournament.h"
 #include "node.h"
 #include "map.h"
