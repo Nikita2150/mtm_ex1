@@ -110,3 +110,47 @@ Node removeFirstNode(Node node)
 
     return node;
 }
+
+Node nodeCopy(Node list)
+{
+    if(list == NULL)
+    {
+        return NULL;
+    }
+
+    Game new_game = gameCopy(list->game);
+    if(new_game == NULL && list->game != NULL)
+    {
+        return NULL;
+    }
+    Node new_list = nodeCreate(new_game);
+    if(new_list == NULL)
+    {
+        gameDestroy(new_game);
+        return NULL;
+    }
+    
+    list = list->next;
+    Node head = new_list;
+    while(list != NULL)
+    {
+        Game add_to_list_game = gameCopy(list->game);
+        if(add_to_list_game == NULL && list->game != NULL)
+        {
+            nodeDestroy(new_list);
+            return NULL;
+        }
+        Node add_to_list = nodeCreate(add_to_list_game);
+
+        if(add_to_list == NULL)
+        {
+            gameDestroy(add_to_list_game);
+            nodeDestroy(new_list);
+            return NULL;
+        }
+        
+        head->next = add_to_list;
+        head = add_to_list;
+    }
+    return new_list;
+}

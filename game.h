@@ -20,6 +20,8 @@ int gameGetPlayTime(Game game);
 
 void gameDestroy(Game game);
 
+Game gameCopy(Game game);
+
 
 #endif // GAME_H_
 

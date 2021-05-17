@@ -25,6 +25,8 @@ void nodeDestroy(Node node);
 
 Node removeFirstNode(Node node);
 
+Node nodeCopy(Node list);
+
 //setnext
 
 #endif // NODE_H_

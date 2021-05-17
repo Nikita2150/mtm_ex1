@@ -42,6 +42,7 @@ Tournament tournamentCopy(Tournament tournament)
         return NULL;
     }
     Tournament new_tournament = tournamentCreate(tournament->max_games_per_player, tournament->tournament_location);
+    new_tournament->games = nodeCopy(tournament->games);
     return new_tournament; //If = NULL, we'll return NULL
 }
 

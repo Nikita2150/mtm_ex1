@@ -90,3 +90,18 @@ void gameDestroy(Game game)
         free(game);
     }
 }
+
+Game gameCopy(Game game)
+{
+    Game new_game = malloc(sizeof(*new_game));
+    if(new_game == NULL)
+    {
+        return NULL;
+    }
+    new_game->first_player = game->first_player;
+    new_game->play_time = game->play_time;
+    new_game->second_player = game->second_player;
+    new_game->winner = game->winner;
+
+    return new_game;
+}
