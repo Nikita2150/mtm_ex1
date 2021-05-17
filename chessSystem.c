@@ -356,6 +356,63 @@ ChessResult chessRemoveTournament(ChessSystem chess, int tournament_id)
     return CHESS_SUCCESS;
 }
 
+ChessResult chessRemovePlayer(ChessSystem chess, int player_id)
+{
+    if(chess == NULL)
+    {
+        return CHESS_NULL_ARGUMENT;
+    }
+    if(player_id <= 0)
+    {
+        return CHESS_INVALID_ID;
+    }
+    if(!mapContains(chess->players, player_id))
+    {
+        return CHESS_PLAYER_NOT_EXIST;
+    }
+    Tournament tournament_iterator = mapGetFirst(chess->tournaments);
+    while(tournament_iterator != NULL)
+    {
+        int temp_tour_winner_id = tournamentGetWinnerId(tournament_iterator);
+
+        Node game_iterator = tournamentGetGames(tournament_iterator);
+        while(game_iterator != NULL)
+        {
+            int temp_first_id = gameGetFirstPlayer(game_iterator);
+            int temp_second_id = gameGetSecondPlayer(game_iterator);
+
+            if(temp_first_id == player_id)
+            {
+                 
+                gameSetFirstPlayer(game_iterator, -1);
+                if(temp_tour_winner_id == -1)
+                {
+                    if(gameGetWinner(game_iterator) == FIRST_PLAYER)
+                    {
+                        playerAddWin(mapGet(chess->players,temp_second_id));
+                        gameSetWinner(game_iterator, SECOND_PLAYER);
+                    }
+
+                }
+            }
+             if(temp_second_id == player_id)
+             {
+                 gameSetSecondPlayer(game_iterator, -1);
+                if(temp_tour_winner_id == -1)
+                {
+                        playerAddWin(mapGet(chess->players,temp_first_id));
+                        gameSetWinner(game_iterator, FIRST_PLAYER);
+                    }
+             }
+            game_iterator = nodeGetNext(game_iterator);
+        }
+    tournament_iterator = mapGetNext(chess->tournaments);
+    }
+    mapRemove(chess->players, player_id);
+
+    return CHESS_SUCCESS;
+}
+
 ChessResult chessEndTournament (ChessSystem chess, int tournament_id)
 {
     if(chess == NULL)
