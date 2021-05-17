@@ -87,7 +87,7 @@ int tournamentGetMaxGamesPerPlayer(Tournament tournament)
     return tournament->max_games_per_player;
 }
 
-Node getGamesOfTournament(Tournament tournament)
+Node tournamentGetGames(Tournament tournament)
 {
     if(tournament == NULL)
     {
@@ -102,4 +102,13 @@ void tournamentRemoveFirstGame(Tournament tournament)
     {
         tournament->games = removeFirstNode(tournament->games);
     }
+}
+
+int tournamentGetWinnerId(Tournament tournament)
+{
+    if(tournament == NULL)
+    {
+        return NULL;//not sure what to return
+    }
+    return tournament->winner_id;
 }

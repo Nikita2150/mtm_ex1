@@ -105,3 +105,11 @@ Game gameCopy(Game game)
 
     return new_game;
 }
+
+void gameSetWinner(Game game, Winner winner)
+{
+    if(game != NULL)
+    {
+        game->winner = winner;
+    }
+}

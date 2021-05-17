@@ -15,6 +15,7 @@ void gameSetFirstPlayer(Game game, int first_to_set);
 void gameSetSecondPlayer(Game game, int second_to_set);
 
 Winner gameGetWinner(Game game);
+void gameSetWinner(Game game, Winner winner);
 
 int gameGetPlayTime(Game game);
 

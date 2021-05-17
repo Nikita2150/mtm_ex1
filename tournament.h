@@ -18,7 +18,8 @@ MapResult tournamentAddGame(Tournament tournament, int first_player, int second_
 
 int tournamentGetMaxGamesPerPlayer(Tournament tournament);
 
-Node getGamesOfTournament(Tournament tournament);
+Node tournamentGetGames(Tournament tournament);
+int tournamentGetWinnerId(Tournament tournament);
 
 void tournamentRemoveFirstGame(Tournament tournament);
 
