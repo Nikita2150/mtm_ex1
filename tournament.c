@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include "stdlib.h"
 #include "tournament.h"
 #include "node.h"
 #include "map.h"
@@ -7,8 +7,6 @@ struct tournament_t
 {
     int max_games_per_player;
     const char* tournament_location;
-
-    bool ended;
     
     Node games;
 };
@@ -23,8 +21,6 @@ Tournament tournamentCreate(int max_games_per_player, const char* tournament_loc
 
     new_tournament->max_games_per_player = max_games_per_player;
     new_tournament->tournament_location = tournament_location;
-
-    new_tournament->ended = false;
 
     new_tournament->games = NULL; //Empty games node
     return new_tournament;
@@ -102,22 +98,5 @@ void tournamentRemoveFirstGame(Tournament tournament)
     if(tournament != NULL)
     {
         tournament->games = removeFirstNode(tournament->games);
-    }
-}
-
-bool tournamentHasEnded(Tournament tournament)
-{
-    if(tournament == NULL)
-    {
-        return false;
-    }
-    return tournament->ended;
-}
-
-void tournamentSetEnded(Tournament tournament)
-{
-    if(tournament != NULL)
-    {
-        tournament->ended = true;
     }
 }

@@ -22,8 +22,5 @@ Node getGamesOfTournament(Tournament tournament);
 
 void tournamentRemoveFirstGame(Tournament tournament);
 
-bool tournamentHasEnded(Tournament tournament);
-void tournamentSetEnded(Tournament tournament);
-
 
 #endif
