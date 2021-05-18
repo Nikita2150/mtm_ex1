@@ -3,7 +3,7 @@
 #include "node.h"
 #include "map.h"
 
-#define TOURNAMENT_IN_PROGRESS -1
+
 
 struct tournament_t
 {

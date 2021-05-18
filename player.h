@@ -25,4 +25,6 @@ int playerNumOfGames(Player player);
 
 void updateRemovedGame(Player player, Winner winner, bool first, int play_time);
 
+void playerSubtractDraw(Player player);
+
 #endif //_PLAYER_H

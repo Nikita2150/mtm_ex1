@@ -61,31 +61,49 @@ Player playerCopy(Player player)
 
 void playerAddGame(Player player)
 {
-    player->num_of_games++;
+    if(player != NULL)
+    {
+        player->num_of_games++;
+    }
 }
 
 void playerAddWin(Player player)
 {
-    player->num_of_wins++;
+    if(player != NULL)
+    {
+        player->num_of_wins++;
+    }
 }
 void playerAddDraw(Player player)
 {
-    player->num_of_draws++;
+    if(player != NULL)
+    {
+        player->num_of_draws++;
+    } 
 }
 
 void playerAddTime(Player player, int time)
 {
-    player->play_time += time;
+    if(player != NULL)
+    {
+        player->play_time += time;
+    }
 }
 
 bool playerGetIsOut(Player player)
 {
-    return player->is_out;
+    if(player != NULL)
+    {
+        return player->is_out;
+    }
 }
 
 int playerNumOfGames(Player player)
 {
-    return player->num_of_games;
+    if(player != NULL)
+    {
+        return player->num_of_games;
+    }
 }
 
 void updateRemovedGame(Player player, Winner winner, bool first, int play_time)
@@ -107,5 +125,13 @@ void updateRemovedGame(Player player, Winner winner, bool first, int play_time)
     else if(winner == SECOND_PLAYER && !first)
     {
         player->num_of_wins--;
+    }
+}
+
+void playerSubtractDraw(Player player)
+{
+    if(player != NULL)
+    {
+        player->num_of_draws--;
     }
 }

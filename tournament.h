@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include "chessSystem.h"
 
+#define TOURNAMENT_IN_PROGRESS -1
+
 typedef struct tournament_t* Tournament;
 
 Tournament tournamentCreate(int max_games_per_player, const char* tournament_location);

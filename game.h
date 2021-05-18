@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
+#define DELETED_PLAYER -2
+
 typedef struct game_t* Game;
 
 

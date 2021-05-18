@@ -331,7 +331,7 @@ ChessResult chessRemoveTournament(ChessSystem chess, int tournament_id)
 
     Tournament this_tournament = mapGet(chess->tournaments, &tournament_id);
 
-    Node games = getGamesOfTournament(this_tournament);
+    Node games = tournamentGetGames(this_tournament);
 
     while(games != NULL)
     {
@@ -348,7 +348,7 @@ ChessResult chessRemoveTournament(ChessSystem chess, int tournament_id)
 
         tournamentRemoveFirstGame(this_tournament);
 
-        games = getGamesOfTournament(this_tournament);
+        games = tournamentGetGames(this_tournament);
     }
 
     mapRemove(chess->tournaments, &tournament_id);
@@ -366,7 +366,7 @@ ChessResult chessRemovePlayer(ChessSystem chess, int player_id)
     {
         return CHESS_INVALID_ID;
     }
-    if(!mapContains(chess->players, player_id))
+    if(!mapContains(chess->players, &player_id))
     {
         return CHESS_PLAYER_NOT_EXIST;
     }
@@ -375,40 +375,48 @@ ChessResult chessRemovePlayer(ChessSystem chess, int player_id)
     {
         int temp_tour_winner_id = tournamentGetWinnerId(tournament_iterator);
 
-        Node game_iterator = tournamentGetGames(tournament_iterator);
-        while(game_iterator != NULL)
+        if(temp_tour_winner_id == TOURNAMENT_IN_PROGRESS)
         {
-            int temp_first_id = gameGetFirstPlayer(game_iterator);
-            int temp_second_id = gameGetSecondPlayer(game_iterator);
+            Node game_iterator = tournamentGetGames(tournament_iterator);
 
-            if(temp_first_id == player_id)
+            while(game_iterator != NULL)
             {
-                 
-                gameSetFirstPlayer(game_iterator, -1);
-                if(temp_tour_winner_id == -1)
-                {
-                    if(gameGetWinner(game_iterator) == FIRST_PLAYER)
-                    {
-                        playerAddWin(mapGet(chess->players,temp_second_id));
-                        gameSetWinner(game_iterator, SECOND_PLAYER);
-                    }
+                int temp_first_id = gameGetFirstPlayer(game_iterator);
+                int temp_second_id = gameGetSecondPlayer(game_iterator);
 
-                }
-            }
-             if(temp_second_id == player_id)
-             {
-                 gameSetSecondPlayer(game_iterator, -1);
-                if(temp_tour_winner_id == -1)
+                if(temp_first_id == player_id)
                 {
-                        playerAddWin(mapGet(chess->players,temp_first_id));
-                        gameSetWinner(game_iterator, FIRST_PLAYER);
+                    gameSetFirstPlayer(game_iterator, DELETED_PLAYER);
+                    if(gameGetWinner(game_iterator) == FIRST_PLAYER || gameGetWinner(game_iterator) == DRAW)
+                    {
+                        playerAddWin(mapGet(chess->players, &temp_second_id)); //If exists - will add, else won't do anything
+                        gameSetWinner(game_iterator, SECOND_PLAYER);
+                        if(gameGetWinner(game_iterator) == DRAW)
+                        {
+                            playerSubtractDraw(mapGet(chess->players, &temp_second_id));
+                        }
                     }
-             }
-            game_iterator = nodeGetNext(game_iterator);
+                }
+                else if(temp_second_id == player_id)
+                {
+                    gameSetSecondPlayer(game_iterator, DELETED_PLAYER);
+                    if(gameGetWinner(game_iterator) == SECOND_PLAYER || gameGetWinner(game_iterator) == DRAW)
+                    {
+                        playerAddWin(mapGet(chess->players, &temp_first_id)); //If exists - will add, else won't do anything
+                        gameSetWinner(game_iterator, FIRST_PLAYER);
+                        if(gameGetWinner(game_iterator) == DRAW)
+                        {
+                            playerSubtractDraw(mapGet(chess->players, &temp_first_id));
+                        }
+                    }
+                }
+                game_iterator = nodeGetNext(game_iterator);
+            }
         }
-    tournament_iterator = mapGetNext(chess->tournaments);
+        tournamentDestroy(tournament_iterator); // because mapGetFirst/mapGetNext create a copy of the real data
+        tournament_iterator = mapGetNext(chess->tournaments);
     }
-    mapRemove(chess->players, player_id);
+    mapRemove(chess->players, &player_id);
 
     return CHESS_SUCCESS;
 }
@@ -430,7 +438,7 @@ ChessResult chessEndTournament (ChessSystem chess, int tournament_id)
 
     Tournament this_tournament = mapGet(chess->tournaments, &tournament_id);
     assert(this_tournament != NULL);
-    Node games_list = getGamesOfTournament(this_tournament);
+    Node games_list = tournamentGetGames(this_tournament);
 
     //What if there are no games yet?
     Map tournament_players = mapCreate(playerCopy, copyInt, playerDestroy, freeInt, compareInts);
