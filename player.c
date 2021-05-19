@@ -135,3 +135,12 @@ void playerSubtractDraw(Player player)
         player->num_of_draws--;
     }
 }
+
+int playerPlayTime(Player player)
+{
+    if(player == NULL)
+    {
+        return -1;
+    }
+    return player->num_of_games;
+}

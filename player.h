@@ -22,6 +22,7 @@ Player playerCopy(Player player);
 bool playerGetIsOut(Player player);
 
 int playerNumOfGames(Player player);
+int playerPlayTime(Player player);
 
 void updateRemovedGame(Player player, Winner winner, bool first, int play_time);
 
