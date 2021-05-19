@@ -505,6 +505,8 @@ double chessCalculateAveragePlayTime(ChessSystem chess, int player_id, ChessResu
         return -1;
     }
 
+    *chess_result = CHESS_SUCCESS;
+
     Player player_data = mapGet(chess->players, &player_id);
     assert(player_data != NULL);
 
