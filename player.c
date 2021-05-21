@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#define WIN_MULTIPLIER 6
+#define WINS_MULTIPLIER 6
 #define LOSSES_MULTIPLIER -10
-#define DRAW_MULTIPLIER 2
+#define DRAWS_MULTIPLIER 2
 
 
 
@@ -146,10 +146,14 @@ int playerGetNumOfLosses(Player player)
     return player->num_of_games - player->num_of_draws - player->num_of_wins;
 }
 
-int playerGetLevel(PLayer player)
+int playerGetLevel(Player player)
 {
     assert(player!=NULL);
-    int x = WIN_MULTIPLIER*playerGetNumOfWins(player) + LOSSES_MULTIPLIER*playerGetNumOfLosses(player) + DRAWS_MULTIPLIER*playerGetNumOfDRaws(player);
+    int x = WINS_MULTIPLIER*playerGetNumOfWins(player) + LOSSES_MULTIPLIER*playerGetNumOfLosses(player) + DRAWS_MULTIPLIER*playerGetNumOfDRaws(player);
     int n = playerGetNumOfGames(player);
+    if(n == 0)
+    {
+        return 0;
+    }
     return x/n;
 }

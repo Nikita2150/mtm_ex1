@@ -23,6 +23,8 @@ int tournamentGetMaxGamesPerPlayer(Tournament tournament);
 Node tournamentGetGames(Tournament tournament);
 int tournamentGetWinnerId(Tournament tournament);
 
+bool tournamentHasEnded(Tournament tournament);
+
 void tournamentRemoveFirstGame(Tournament tournament);
 
 

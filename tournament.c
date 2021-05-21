@@ -106,9 +106,12 @@ void tournamentRemoveFirstGame(Tournament tournament)
 
 int tournamentGetWinnerId(Tournament tournament)
 {
-    if(tournament == NULL)
-    {
-        return NULL;//not sure what to return
-    }
+    assert(tournament != NULL)
     return tournament->winner_id;
+}
+
+bool tournamentHasEnded(Tournament tournament)
+{
+    assert(tournament != NULL);
+    return tournamentGetWinnerId(tournament) != TOURNAMENT_IN_PROGRESS;
 }

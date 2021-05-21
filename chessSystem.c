@@ -232,14 +232,23 @@ ChessResult chessAddTournament(ChessSystem chess, int tournament_id, int max_gam
         return CHESS_NULL_ARGUMENT;
     }
 
-    if(tournament_id < 0)
+    if(tournament_id <= 0)
     {
         return CHESS_INVALID_ID;
+    }
+    if(mapContains(chess->tournaments, &tournament_id))
+    {
+        return CHESS_TOURNAMENT_ALREADY_EXISTS;
     }
     if(tournament_location == "")//Is this the only empty string?
     {
         return CHESS_INVALID_LOCATION;
+    } //should create a function that checks the location!!!
+    if(max_games_per_player <= 0)
+    {
+        return CHESS_INVALID_MAX_GAMES;
     }
+    
     
 
     if(chess->tournaments == NULL)
@@ -247,12 +256,8 @@ ChessResult chessAddTournament(ChessSystem chess, int tournament_id, int max_gam
         chess->tournaments = mapCreate(tournamentCopy, copyInt, tournamentDestroy, freeInt, compareInts);
     }
 
-    int* tournament_id_key = &tournament_id;
     
-    if(mapContains(chess->tournaments, tournament_id_key))
-    {
-        return CHESS_TOURNAMENT_ALREADY_EXISTS;
-    }
+    
 
     Tournament new_tournament = tournamentCreate(max_games_per_player, tournament_location);
     if(new_tournament == NULL)
@@ -261,7 +266,7 @@ ChessResult chessAddTournament(ChessSystem chess, int tournament_id, int max_gam
         return CHESS_OUT_OF_MEMORY;
     }
     
-    ChessResult insert_tournament_result = convertMapResult(chess, mapPut(chess->tournaments, tournament_id_key, new_tournament));
+    ChessResult insert_tournament_result = convertMapResult(chess, mapPut(chess->tournaments, &tournament_id, new_tournament));
     tournamentDestroy(new_tournament); //because we copied the tournament
 
     return insert_tournament_result;
@@ -275,7 +280,7 @@ ChessResult chessAddGame(ChessSystem chess, int tournament_id, int first_player,
     {
         return CHESS_NULL_ARGUMENT;
     }
-    if(tournament_id < 0 || first_player < 0 || second_player < 0 || first_player == second_player)
+    if(tournament_id <= 0 || first_player <= 0 || second_player <= 0 || first_player == second_player)
     {
         return CHESS_INVALID_ID;
     }
@@ -287,6 +292,10 @@ ChessResult chessAddGame(ChessSystem chess, int tournament_id, int first_player,
         return CHESS_TOURNAMENT_NOT_EXIST;
     }
     Tournament this_tournament = mapGet(chess->tournaments, tournament_id_key);
+    if(tournamentHasEnded(this_tournament))
+    {
+        return CHESS_TOURNAMENT_ENDED;
+    }
 
     
     Player first_player_data, second_player_data;
@@ -297,14 +306,11 @@ ChessResult chessAddGame(ChessSystem chess, int tournament_id, int first_player,
         return CHESS_OUT_OF_MEMORY;
     }
 
-    if(!(playerGetIsOut(second_player_data) || playerGetIsOut(first_player_data)))
+    if(tournamentContains(mapGet(chess->tournaments, this_tournament), first_player, second_player)
+        || tournamentContains(mapGet(chess->tournaments, this_tournament), second_player, first_player))
     {
-        if(tournamentContains(mapGet(chess->tournaments, this_tournament), first_player, second_player)
-            || tournamentContains(mapGet(chess->tournaments, this_tournament), second_player, first_player))
-        {
-            freeNeededPlayers(chess->players, first_player, second_player, first_player_data, second_player_data);
-            return CHESS_GAME_ALREADY_EXISTS;
-        }
+        freeNeededPlayers(chess->players, first_player, second_player, first_player_data, second_player_data);
+        return CHESS_GAME_ALREADY_EXISTS;
     }
 
     if(play_time <= 0)
@@ -422,9 +428,9 @@ ChessResult chessRemovePlayer(ChessSystem chess, int player_id)
     while(tournament_iterator_id != NULL)
     {
         Tournament tournament_iterator = mapGet(chess->tournaments, tournament_iterator_id);
-        int temp_tour_winner_id = tournamentGetWinnerId(tournament_iterator);
+        int temp_tournament_winner_id = tournamentGetWinnerId(tournament_iterator);
 
-        if(temp_tour_winner_id == TOURNAMENT_IN_PROGRESS)
+        if(temp_tournament_winner_id == TOURNAMENT_IN_PROGRESS)
         {
             Node game_iterator = tournamentGetGames(tournament_iterator);
 
@@ -484,9 +490,20 @@ ChessResult chessEndTournament (ChessSystem chess, int tournament_id)
     {
         return CHESS_TOURNAMENT_NOT_EXIST;
     }
+    
 
     Tournament this_tournament = mapGet(chess->tournaments, &tournament_id);
+    if(tournamentHasEnded(this_tournament))
+    {
+        return CHESS_TOURNAMENT_ENDED;
+    }
     assert(this_tournament != NULL);
+
+    if(tournamentGetGames(this_tournament) == NULL)
+    {
+        return CHESS_NO_GAMES;
+    }
+    
     Node games_list = tournamentGetGames(this_tournament);
 
     //What if there are no games yet?
@@ -528,7 +545,8 @@ ChessResult chessEndTournament (ChessSystem chess, int tournament_id)
                 return insert_player_one_result;
             }
             return insert_player_two_result;
-        }        
+        }      
+        games_list = nodeGetNext(games_list);  
     }
 
     //Need to get the scores of the players and calculate who won:
@@ -608,4 +626,40 @@ ChessResult chessSavePlayersLevels (ChessSystem chess, FILE* file)
     }
     free(player_id_and_level);
     return CHESS_SUCCESS;
+}
+
+ChessResult chessSaveTournamentStatistics (ChessSystem chess, char* path_file)
+{
+    if(chess == NULL)
+    {
+        return CHESS_NULL_ARGUMENT;
+    }
+    bool all_in_progress = true;
+    for(int* tournament_iterator_id = mapGetFirst(chess->tournaments); tournament_iterator_id != NULL; tournament_iterator_id = mapGetNext(chess->tournaments))
+    {
+        if(tournamentHasEnded(mapGet(chess->tournaments, tournament_iterator_id)))
+        {
+            all_in_progress= false;
+        }
+    }
+    if(all_in_progress)
+        {
+            return CHESS_NO_TOURNAMENTS_ENDED;
+        }
+    FILE* stream  = fopen(path_file, "w");
+    if(stream == NULL)
+    {
+        return CHESS_SAVE_FAILURE;
+    }
+    for(int* tournament_iterator_id = mapGetFirst(chess->tournaments); tournament_iterator_id != NULL; tournament_iterator_id = mapGetNext(chess->tournaments))
+    {
+        Tournament tournament_iterator = mapGet(chess->tournaments, tournament_iterator_id);
+        if(tournamentHasEnded(tournament_iterator))
+        {
+            if(fprintf(stream, "")
+        }
+    }
+    
+    
+    
 }
