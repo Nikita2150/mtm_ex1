@@ -106,7 +106,7 @@ void tournamentRemoveFirstGame(Tournament tournament)
 
 int tournamentGetWinnerId(Tournament tournament)
 {
-    assert(tournament != NULL)
+    assert(tournament != NULL);
     return tournament->winner_id;
 }
 

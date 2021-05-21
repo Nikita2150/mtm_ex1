@@ -27,5 +27,13 @@ bool tournamentHasEnded(Tournament tournament);
 
 void tournamentRemoveFirstGame(Tournament tournament);
 
+char* tournamentGetLocation(Tournament tournament);
+
+int tournamentGetLongestPlayTime(Tournament tournament);
+int tournamentGetNumOfGames(Tournament tournament);
+int tournamentGetNumOfPlayers(Tournament tournament);
+int tournamentGetPlayTime(Tournament tournament);
+int tournamentGetAveragePlayTime(Tournament tournament);
+
 
 #endif

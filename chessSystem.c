@@ -656,10 +656,17 @@ ChessResult chessSaveTournamentStatistics (ChessSystem chess, char* path_file)
         Tournament tournament_iterator = mapGet(chess->tournaments, tournament_iterator_id);
         if(tournamentHasEnded(tournament_iterator))
         {
-            if(fprintf(stream, "")
+            if(fprintf(stream, "%d\n%d\n%d\n%s\n%d\n%d\n", tournamentGetWinnerId(tournament_iterator), tournamentGetLongestPlayTime(tournament_iterator),
+                                                            tournamentGetAveragePlayTime(tournament_iterator), tournamentGetLocation(tournament_iterator),
+                                                            tournamentGetNumOfGames(tournament_iterator), tournamentGetNumOfPlayers(tournament_iterator) == EOF))
+            {
+                free(tournament_iterator_id);
+                fclose(stream);
+                return CHESS_SAVE_FAILURE;
+            }
+            free(tournament_iterator_id);
         }
     }
-    
-    
-    
+    fclose(stream);
+    return CHESS_SUCCESS;
 }
