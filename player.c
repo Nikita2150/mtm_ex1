@@ -2,6 +2,13 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <assert.h>
+
+#define WIN_MULTIPLIER 6
+#define LOSSES_MULTIPLIER -10
+#define DRAW_MULTIPLIER 2
+
+
 
 struct player_t
 {
@@ -9,7 +16,6 @@ struct player_t
     int num_of_wins;
     int num_of_draws;
     int play_time;
-    bool is_out;
 };
 
 Player playerCreate()
@@ -24,7 +30,6 @@ Player playerCreate()
     new_player->num_of_wins = 0;
     new_player->num_of_draws = 0;
     new_player->play_time = 0;
-    new_player->is_out = false;
 
     return new_player;
 }
@@ -49,7 +54,6 @@ Player playerCopy(Player player)
         return NULL;
     }
     
-    new_player->is_out = player->is_out;
     new_player->num_of_draws = player->num_of_draws;
     new_player->num_of_games = player->num_of_games;
     new_player->num_of_wins = player->num_of_wins;
@@ -61,57 +65,40 @@ Player playerCopy(Player player)
 
 void playerAddGame(Player player)
 {
-    if(player != NULL)
-    {
-        player->num_of_games++;
-    }
+    assert(player!=NULL);
+    player->num_of_games++;
 }
 
 void playerAddWin(Player player)
 {
-    if(player != NULL)
-    {
-        player->num_of_wins++;
-    }
+    assert(player!=NULL);
+    player->num_of_wins++;
 }
+
 void playerAddDraw(Player player)
 {
-    if(player != NULL)
-    {
-        player->num_of_draws++;
-    } 
+    assert(player!=NULL);
+    player->num_of_draws++;
+    
 }
 
 void playerAddTime(Player player, int time)
 {
-    if(player != NULL)
-    {
-        player->play_time += time;
-    }
+    assert(player!=NULL);
+    player->play_time += time;
+    
 }
 
-bool playerGetIsOut(Player player)
+int playerGetNumOfGames(Player player)
 {
-    if(player != NULL)
-    {
-        return player->is_out;
-    }
+    assert(player!=NULL);
+    return player->num_of_games;
+    
 }
 
-int playerNumOfGames(Player player)
+void playerUpdateRemovedGame(Player player, Winner winner, bool first, int play_time)
 {
-    if(player != NULL)
-    {
-        return player->num_of_games;
-    }
-}
-
-void updateRemovedGame(Player player, Winner winner, bool first, int play_time)
-{
-    if(player == NULL)
-    {
-        return;
-    }
+    assert(player!=NULL);
     player->num_of_games--;
     player->play_time -= play_time;
     if(winner == DRAW)
@@ -130,17 +117,39 @@ void updateRemovedGame(Player player, Winner winner, bool first, int play_time)
 
 void playerSubtractDraw(Player player)
 {
-    if(player != NULL)
-    {
-        player->num_of_draws--;
-    }
+    assert(player!=NULL);
+    player->num_of_draws--;
+    
 }
 
-int playerPlayTime(Player player)
+int playerGetPlayTime(Player player)
 {
-    if(player == NULL)
-    {
-        return -1;
-    }
+    assert(player!=NULL);
     return player->num_of_games;
+}
+
+int playerGetNumOfWins(Player player)
+{
+    assert(player!=NULL);
+    return player->num_of_wins;
+}
+
+int playerGetNumOfDraws(Player player)
+{
+    assert(player!=NULL);
+    return player->num_of_draws;
+}
+
+int playerGetNumOfLosses(Player player)
+{
+    assert(player!=NULL);
+    return player->num_of_games - player->num_of_draws - player->num_of_wins;
+}
+
+int playerGetLevel(PLayer player)
+{
+    assert(player!=NULL);
+    int x = WIN_MULTIPLIER*playerGetNumOfWins(player) + LOSSES_MULTIPLIER*playerGetNumOfLosses(player) + DRAWS_MULTIPLIER*playerGetNumOfDRaws(player);
+    int n = playerGetNumOfGames(player);
+    return x/n;
 }

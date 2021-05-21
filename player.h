@@ -19,12 +19,19 @@ void playerAddTime(Player player, int time);
 
 Player playerCopy(Player player);
 
-bool playerGetIsOut(Player player);
 
-int playerNumOfGames(Player player);
-int playerPlayTime(Player player);
+int playerGetNumOfGames(Player player);
+int playerGetNumOfWins(Player player);
+int playerGetNumOfDraws(Player player);
+int playerGetNumOfLosses(Player player);
 
-void updateRemovedGame(Player player, Winner winner, bool first, int play_time);
+int playerGetLevel(Player player);
+
+
+int playerGetPlayTime(Player player);
+
+
+void playerUpdateRemovedGame(Player player, Winner winner, bool first, int play_time);
 
 void playerSubtractDraw(Player player);
 

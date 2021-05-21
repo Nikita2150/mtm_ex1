@@ -148,6 +148,54 @@ static void freeNeededPlayers(Map players, int first_player, int second_player, 
     }
 }
 
+static void shiftArrayRight(int** array, int index, int last_index)
+{
+    for(int i = last_index; i > index; i--)
+    {
+        array[i][0] = array[i-1][0];
+        array[i][1] = array[i-1][1];
+    }
+}
+
+static bool putInArray(int** array, int player_id, int level, int size, int last_added)
+{
+    if(array == NULL)
+    {
+        return false;
+    }
+    if(player_id < 0)
+    {
+        return false;
+    }
+    if(size == 0)
+    {
+        return true;
+    }
+    if(last_added >= size - 1)
+    {
+        return false;
+    }
+    if(last_added == 0)
+    {
+        array[last_added][0] = player_id;
+        array[last_added][1] = level; 
+    }
+    for(int i = 0; i < last_added; i++)
+    {
+        if(level > array[i][1])
+        {
+            shiftArrayRight(array, i, last_added+1);
+            array[i][0] = player_id;
+            array[i][1] = level;
+            return true;
+        }
+    }
+    array[last_added + 1][0] = player_id;
+    array[last_added + 1][0] = level;
+    return true;
+
+}
+
 
 
 
@@ -265,8 +313,8 @@ ChessResult chessAddGame(ChessSystem chess, int tournament_id, int first_player,
         return CHESS_INVALID_PLAY_TIME;
     }
 
-    if(playerNumOfGames(first_player_data) >= tournamentGetMaxGamesPerPlayer(this_tournament)
-    || playerNumOfGames(second_player_data) >= tournamentGetMaxGamesPerPlayer(this_tournament))
+    if(playerGetNumOfGames(first_player_data) >= tournamentGetMaxGamesPerPlayer(this_tournament)
+    || playerGetNumOfGames(second_player_data) >= tournamentGetMaxGamesPerPlayer(this_tournament))
     {
         freeNeededPlayers(chess->players, first_player, second_player, first_player_data, second_player_data);
         return CHESS_EXCEEDED_GAMES;
@@ -343,8 +391,8 @@ ChessResult chessRemoveTournament(ChessSystem chess, int tournament_id)
         Player second_player_data = mapGet(chess->players, &second_player);
         //ASSERT: both aren't NULL
 
-        updateRemovedGame(first_player_data, gameGetWinner(games), true, gameGetPlayTime(games));
-        updateremovedGame(second_player_data, gameGetWinner(games), false, gameGetPlayTime(games));
+        playerUpdateRemovedGame(first_player_data, gameGetWinner(games), true, gameGetPlayTime(games));
+        playerUpdateRemovedGame(second_player_data, gameGetWinner(games), false, gameGetPlayTime(games));
 
         tournamentRemoveFirstGame(this_tournament);
 
@@ -370,9 +418,10 @@ ChessResult chessRemovePlayer(ChessSystem chess, int player_id)
     {
         return CHESS_PLAYER_NOT_EXIST;
     }
-    Tournament tournament_iterator = mapGetFirst(chess->tournaments);
-    while(tournament_iterator != NULL)
+    int* tournament_iterator_id = mapGetFirst(chess->tournaments);
+    while(tournament_iterator_id != NULL)
     {
+        Tournament tournament_iterator = mapGet(chess->tournaments, tournament_iterator_id);
         int temp_tour_winner_id = tournamentGetWinnerId(tournament_iterator);
 
         if(temp_tour_winner_id == TOURNAMENT_IN_PROGRESS)
@@ -413,8 +462,8 @@ ChessResult chessRemovePlayer(ChessSystem chess, int player_id)
                 game_iterator = nodeGetNext(game_iterator);
             }
         }
-        tournamentDestroy(tournament_iterator); // because mapGetFirst/mapGetNext create a copy of the real data
-        tournament_iterator = mapGetNext(chess->tournaments);
+        free(tournament_iterator_id); // because mapGetFirst/mapGetNext create a copy of the real data
+        tournament_iterator_id = mapGetNext(chess->tournaments);
     }
     mapRemove(chess->players, &player_id);
 
@@ -510,10 +559,53 @@ double chessCalculateAveragePlayTime(ChessSystem chess, int player_id, ChessResu
     Player player_data = mapGet(chess->players, &player_id);
     assert(player_data != NULL);
 
-    if(playerNumOfGames(player_data) == 0)
+    if(playerGetNumOfGames(player_data) == 0)
     {
         return 0;
     }
 
-    retrun (playerPlayTime(player_data) * 1.0) / playerNumOfGames(player_data);
+    retrun (playerGetPlayTime(player_data) * 1.0) / playerGetNumOfGames(player_data);
+}
+
+
+ChessResult chessSavePlayersLevels (ChessSystem chess, FILE* file)
+{
+    if(chess == NULL)
+    {
+        return CHESS_NULL_ARGUMENT;
+    }
+    
+    int num_of_players = mapGetSize(chess->players);
+    int* player_id_and_level[2] = malloc(sizeof(num_of_players));
+    if(player_id_and_level == NULL)
+    {
+        chessDestroy(chess);
+        return CHESS_OUT_OF_MEMORY;
+    }
+    int* player_iterator_id = mapGetFirst(chess->players);
+    int counter = 0;
+    while(player_iterator_id != NULL)
+    {
+        Player current_player = mapGet(chess->players, player_iterator_id);
+        if(playerGetNumOfGames(current_player) != 0)
+        {
+            if(!putInArray(player_id_and_level, *player_iterator_id, playerGetLevel(current_player), num_of_players, counter++))
+            {
+                return CHESS_SAVE_FAILURE;
+            }
+        }
+
+        free(player_iterator_id);
+        player_iterator_id = mapGetNext(chess->players);
+    }
+
+    for(int i = 0; i < counter; i++)
+    {
+        if(fprintf(file, "%d %d\n", player_id_and_level[i][0], player_id_and_level[i][1]) == EOF)
+        {
+            return CHESS_SAVE_FAILURE;
+        }
+    }
+    free(player_id_and_level);
+    return CHESS_SUCCESS;
 }
