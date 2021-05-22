@@ -2,6 +2,8 @@
 #define GAME_H_
 
 #include <stdio.h>
+#include "chessSystem.h"
+#include <assert.h>
 
 #define DELETED_PLAYER -2
 

@@ -3,11 +3,13 @@
 
 #include <stdbool.h>
 #include "chessSystem.h"
+#include "map.h"
 
 typedef struct player_t* Player;
 
 Player playerCreate();
 void playerDestroy(Player player);
+void playerFree(MapDataElement player);
 
 void playerAddGame(Player player);
 
@@ -17,7 +19,7 @@ void playerAddDraw(Player player);
 
 void playerAddTime(Player player, int time);
 
-Player playerCopy(Player player);
+MapDataElement playerCopy(MapDataElement player);
 
 int playerGetScore(Player player);
 

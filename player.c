@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "map.h"
 
 #define WINS_LEVEL_MULTIPLIER 6
 #define LOSSES_LEVEL_MULTIPLIER -10
@@ -38,7 +39,7 @@ Player playerCreate()
     return new_player;
 }
 
-void palyerDestroy(Player player)
+void playerDestroy(Player player)
 {
     if(player != NULL)
     {
@@ -46,24 +47,33 @@ void palyerDestroy(Player player)
     }
 }
 
-Player playerCopy(Player player)
+void playerFree(MapDataElement player)
+{
+    if(player != NULL)
+    {
+        playerDestroy((Player) player);
+    }
+}
+
+MapDataElement playerCopy(MapDataElement player)
 {
     if(player == NULL)
     {
         return NULL;
     }
+    Player this_player = (Player) player;
     Player new_player = malloc(sizeof(*new_player));
     if(new_player == NULL)
     {
         return NULL;
     }
     
-    new_player->num_of_draws = player->num_of_draws;
-    new_player->num_of_games = player->num_of_games;
-    new_player->num_of_wins = player->num_of_wins;
-    new_player->play_time = player->play_time;
+    new_player->num_of_draws = this_player->num_of_draws;
+    new_player->num_of_games = this_player->num_of_games;
+    new_player->num_of_wins = this_player->num_of_wins;
+    new_player->play_time = this_player->play_time;
 
-    return new_player;    
+    return (MapDataElement) new_player;    
 }
 
 
@@ -164,7 +174,7 @@ int playerGetNumOfLosses(Player player)
 int playerGetLevel(Player player)
 {
     assert(player!=NULL);
-    int x = WINS_LEVEL_MULTIPLIER*playerGetNumOfWins(player) + LOSSES_LEVEL_MULTIPLIER*playerGetNumOfLosses(player) + DRAWS_LEVEL_MULTIPLIER*playerGetNumOfDRaws(player);
+    int x = WINS_LEVEL_MULTIPLIER*playerGetNumOfWins(player) + LOSSES_LEVEL_MULTIPLIER*playerGetNumOfLosses(player) + DRAWS_LEVEL_MULTIPLIER*playerGetNumOfDraws(player);
     int n = playerGetNumOfGames(player);
     if(n == 0)
     {

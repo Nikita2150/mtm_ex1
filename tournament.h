@@ -3,6 +3,9 @@
 
 #include <stdbool.h>
 #include "chessSystem.h"
+#include "node.h"
+#include "map.h"
+#include <assert.h>
 
 #define TOURNAMENT_IN_PROGRESS -1
 
@@ -13,8 +16,9 @@ Tournament tournamentCreate(int max_games_per_player, const char* tournament_loc
 bool tournamentContains(Tournament tournament, int first_player, int second_player);
 
 void tournamentDestroy(Tournament tournament);
+void tournamentFree(MapDataElement tournament);
 
-Tournament tournamentCopy(Tournament tournament);
+MapDataElement tournamentCopy(MapDataElement tournament);
 
 MapResult tournamentAddGame(Tournament tournament, int first_player, int second_player, Winner winner, int play_time);
 
@@ -27,13 +31,13 @@ bool tournamentHasEnded(Tournament tournament);
 
 void tournamentRemoveFirstGame(Tournament tournament);
 
-char* tournamentGetLocation(Tournament tournament);
+const char* tournamentGetLocation(Tournament tournament);
 
 int tournamentGetLongestPlayTime(Tournament tournament);
 int tournamentGetNumOfGames(Tournament tournament);
 int tournamentGetNumOfPlayers(Tournament tournament);
 int tournamentGetPlayTime(Tournament tournament);
-int tournamentGetAveragePlayTime(Tournament tournament);
+double tournamentGetAveragePlayTime(Tournament tournament);
 
-void setTournamentWinnerId(Tournament tournament, int winner_id);
+void tournamentSetWinnerId(Tournament tournament, int winner_id);
 #endif

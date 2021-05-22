@@ -33,11 +33,10 @@ Game nodeGetGame(Node node)
 
 void nodeSetGame(Node node, Game game)
 {
-    if(node == NULL)
+    if(node != NULL)
     {
-        return NULL;
+         node->game = game;
     }
-    node->game = game;
 }
 
 Node nodeGetNext(Node node)
@@ -51,12 +50,10 @@ Node nodeGetNext(Node node)
 
 void nodeSetNext(Node node, Node to_set_next)
 {
-    if(node == NULL)
+    if(node != NULL)
     {
-        return NULL;
+        node->next = to_set_next;
     }
-    node->next = to_set_next;
-    
 }
 
 void nodeDestroy(Node node)
@@ -86,7 +83,7 @@ bool nodeContains(Node node, int first_player, int second_player)
 
 Node nodeAdd(Node list, Game game)
 {
-    //ASSERT, game != NULL
+    assert(list != NULL && game != NULL);
     Node new_node = nodeCreate(game);
     if(new_node == NULL)
     {
@@ -153,4 +150,48 @@ Node nodeCopy(Node list)
         head = add_to_list;
     }
     return new_list;
+}
+
+
+int nodeGetSize(Node list)
+{
+    int counter = 0;
+    while(list != NULL)
+    {
+        counter++;
+        list = list->next;
+    }
+    return counter;
+}
+int nodeGetTotalPlayTime(Node list)
+{
+    int total_play_time = 0;
+    while(list != NULL)
+    {
+        total_play_time += gameGetPlayTime(list->game);
+        list = list->next;
+    }
+    return total_play_time;
+}
+int nodeGetLongestPlayTime(Node list)
+{
+    int max_play_time = 0;
+    while(list != NULL)
+    {
+        if(gameGetPlayTime(list->game) > max_play_time)
+        {
+            max_play_time = gameGetPlayTime(list->game);
+        }
+        list = list->next;
+    }
+    return max_play_time;
+}
+double nodeGetAveragePlayTime(Node list)
+{
+    if(nodeGetSize(list) == 0)
+    {
+        return 0;
+    }
+
+    return (nodeGetTotalPlayTime(list) * 1.0) / nodeGetSize(list);
 }

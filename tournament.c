@@ -2,6 +2,7 @@
 #include "tournament.h"
 #include "node.h"
 #include "map.h"
+#include "set.h"
 
 
 
@@ -11,6 +12,7 @@ struct tournament_t
     const char* tournament_location;
     int winner_id;
     Node games;
+    Set tournament_players;
 };
 
 Tournament tournamentCreate(int max_games_per_player, const char* tournament_location)
@@ -24,6 +26,7 @@ Tournament tournamentCreate(int max_games_per_player, const char* tournament_loc
     new_tournament->max_games_per_player = max_games_per_player;
     new_tournament->tournament_location = tournament_location;
 
+    new_tournament->tournament_players = setCreate();
     new_tournament->games = NULL; //Empty games node
     return new_tournament;
 }
@@ -33,20 +36,30 @@ void tournamentDestroy(Tournament tournament)
     if(tournament != NULL)
     {
         nodeDestroy(tournament->games);
+        setDestroy(tournament->tournament_players);
         free(tournament);
     }
 }
+void tournamentFree(MapDataElement tournament)
+{
+    if(tournament != NULL)
+    {
+        tournamentDestroy((Tournament) tournament);
+    }
+}
 
-Tournament tournamentCopy(Tournament tournament)
+MapDataElement tournamentCopy(MapDataElement tournament)
 {
     if(tournament == NULL)
     {
         return NULL;
     }
-    Tournament new_tournament = tournamentCreate(tournament->max_games_per_player, tournament->tournament_location);
-    new_tournament->games = nodeCopy(tournament->games);
-    new_tournament->winner_id = tournament->winner_id;
-    return new_tournament; //If = NULL, we'll return NULL
+    Tournament this_tournament = (Tournament) tournament;
+    Tournament new_tournament = tournamentCreate(this_tournament->max_games_per_player, this_tournament->tournament_location);
+    new_tournament->games = nodeCopy(this_tournament->games);
+    new_tournament->winner_id = this_tournament->winner_id;
+    new_tournament->tournament_players = setCopy(this_tournament->tournament_players);//function does not exist in the moment: 22/05/2021 14:51
+    return (MapDataElement) new_tournament; //If = NULL, we'll return NULL
 }
 
 bool tournamentContains(Tournament tournament, int first_player, int second_player)
@@ -75,6 +88,8 @@ MapResult tournamentAddGame(Tournament tournament, int first_player, int second_
         return MAP_OUT_OF_MEMORY;
     }
     tournament->games = new_games_list;
+    setAdd(tournament->tournament_players, first_player);
+    setAdd(tournament->tournament_players, second_player);
     return MAP_SUCCESS;
 }
 
@@ -116,7 +131,40 @@ bool tournamentHasEnded(Tournament tournament)
     return tournamentGetWinnerId(tournament) != TOURNAMENT_IN_PROGRESS;
 }
 
-void setTournamentWinnerId(Tournament tournament, int winner_id)
+const char* tournamentGetLocation(Tournament tournament)
+{
+    assert(tournament != NULL);
+    return tournament->tournament_location;
+}
+
+int tournamentGetLongestPlayTime(Tournament tournament)
+{
+    assert(tournament != NULL);
+    return nodeGetLongestPlayTime(tournament->games);
+}
+int tournamentGetNumOfGames(Tournament tournament)
+{
+    assert(tournament != NULL);
+    return nodeGetSize(tournament->games);
+}
+int tournamentGetNumOfPlayers(Tournament tournament)
+{
+    assert(tournament != NULL);
+    return setGetSize(tournament->tournament_players);
+  //NOAM IT'S YOUR ZONE, fuck yessssss
+}
+int tournamentGetPlayTime(Tournament tournament)
+{
+    assert(tournament != NULL);
+    return nodeGetTotalPlayTime(tournament->games);
+}
+double tournamentGetAveragePlayTime(Tournament tournament)
+{
+    assert(tournament != NULL);
+    return nodeGetAveragePlayTime(tournament->games);
+}
+
+void tournamentSetWinnerId(Tournament tournament, int winner_id)
 {
     assert(tournament != NULL);
 

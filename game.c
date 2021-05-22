@@ -41,18 +41,12 @@ void gameDestroy(Game game)
 
 int gameGetFirstPlayer(Game game)
 {
-    if(game == NULL)
-    {
-        return -1;
-    }
+    assert(game != NULL);
     return game->first_player;
 }
-int gameGetFirstPlayer(Game game)
+int gameGetSecondPlayer(Game game)
 {
-    if(game == NULL)
-    {
-        return -1;
-    }
+    assert(game != NULL);
     return game->second_player;
 }
 
@@ -74,25 +68,21 @@ void gameSetSecondPlayer(Game game, int second_to_set)
 //ASSERT: game exists
 Winner gameGetWinner(Game game)
 {
+    assert(game != NULL);
     return game->winner;
 }
 
 //ASSERT: game exists
 int gameGetPlayTime(Game game)
 {
+    assert(game != NULL);
     return game->play_time;
 }
 
-void gameDestroy(Game game)
-{
-    if(game != NULL)
-    {
-        free(game);
-    }
-}
 
 Game gameCopy(Game game)
 {
+    assert(game != NULL);
     Game new_game = malloc(sizeof(*new_game));
     if(new_game == NULL)
     {

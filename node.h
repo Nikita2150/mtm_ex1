@@ -4,6 +4,7 @@
 #include "game.h"
 #include "chessSystem.h"
 #include <stdbool.h>
+#include <assert.h>
 
 typedef struct node_t* Node;
 
@@ -26,6 +27,11 @@ void nodeDestroy(Node node);
 Node removeFirstNode(Node node);
 
 Node nodeCopy(Node list);
+
+int nodeGetSize(Node list);
+int nodeGetTotalPlayTime(Node list);
+int nodeGetLongestPlayTime(Node list);
+double nodeGetAveragePlayTime(Node list);
 
 //setnext
 
