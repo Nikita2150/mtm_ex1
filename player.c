@@ -4,9 +4,13 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#define WINS_MULTIPLIER 6
-#define LOSSES_MULTIPLIER -10
-#define DRAWS_MULTIPLIER 2
+#define WINS_LEVEL_MULTIPLIER 6
+#define LOSSES_LEVEL_MULTIPLIER -10
+#define DRAWS_LEVEL_MULTIPLIER 2
+
+#define WINS_SCORE_MULTIPLIER 2
+#define LOSSES_SCORE_MULTIPLIER 0
+#define DRAW_SCORE_MULTIPLIER 1
 
 
 
@@ -115,6 +119,17 @@ void playerUpdateRemovedGame(Player player, Winner winner, bool first, int play_
     }
 }
 
+int playerGetScore(Player player)
+{
+    assert(player != NULL);
+    if(player->num_of_games == 0)
+    {
+        return 0;
+    }
+    return ((player->num_of_wins * WINS_SCORE_MULTIPLIER + player->num_of_draws * DRAW_SCORE_MULTIPLIER +
+             (playerGetNumOfLosses(player) * LOSSES_SCORE_MULTIPLIER)) / player->num_of_games);
+}
+
 void playerSubtractDraw(Player player)
 {
     assert(player!=NULL);
@@ -149,11 +164,25 @@ int playerGetNumOfLosses(Player player)
 int playerGetLevel(Player player)
 {
     assert(player!=NULL);
-    int x = WINS_MULTIPLIER*playerGetNumOfWins(player) + LOSSES_MULTIPLIER*playerGetNumOfLosses(player) + DRAWS_MULTIPLIER*playerGetNumOfDRaws(player);
+    int x = WINS_LEVEL_MULTIPLIER*playerGetNumOfWins(player) + LOSSES_LEVEL_MULTIPLIER*playerGetNumOfLosses(player) + DRAWS_LEVEL_MULTIPLIER*playerGetNumOfDRaws(player);
     int n = playerGetNumOfGames(player);
     if(n == 0)
     {
         return 0;
     }
     return x/n;
+}
+
+bool sameWinner(Player current_winner, int current_winner_id, Player current_player, int current_player_id)
+{
+    assert(current_winner != NULL && current_player != NULL);
+    if(playerGetNumOfLosses(current_winner) == playerGetNumOfLosses(current_player))
+    {
+        if(current_winner->num_of_wins == current_player->num_of_wins)
+        {
+            return current_winner_id < current_player_id;
+        }
+        return (current_winner->num_of_wins > current_player->num_of_wins) ? true : false;
+    }
+    return (playerGetNumOfLosses(current_winner) < playerGetNumOfLosses(current_player)) ? true : false;
 }

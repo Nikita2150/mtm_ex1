@@ -35,5 +35,5 @@ int tournamentGetNumOfPlayers(Tournament tournament);
 int tournamentGetPlayTime(Tournament tournament);
 int tournamentGetAveragePlayTime(Tournament tournament);
 
-
+void setTournamentWinnerId(Tournament tournament, int winner_id);
 #endif

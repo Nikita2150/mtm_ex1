@@ -524,8 +524,8 @@ ChessResult chessEndTournament (ChessSystem chess, int tournament_id)
         }
         updateNewGame(first_player_data, second_player_data, gameGetWinner(games_list), gameGetPlayTime(games_list));
 
-        ChessResult insert_player_one_result = convertMapResult(chess,  mapPut(chess->players, first_player, first_player_data));
-        ChessResult insert_player_two_result = convertMapResult(chess,  mapPut(chess->players, second_player, second_player_data));
+        ChessResult insert_player_one_result = convertMapResult(chess,  mapPut(tournament_players, first_player, first_player_data));
+        ChessResult insert_player_two_result = convertMapResult(chess,  mapPut(tournament_players, second_player, second_player_data));
 
         //They have been copied in mapPut
         playerDestroy(first_player_data);
@@ -550,7 +550,36 @@ ChessResult chessEndTournament (ChessSystem chess, int tournament_id)
     }
 
     //Need to get the scores of the players and calculate who won:
-    
+    int* player_iterator_id = mapGetFirst(tournament_players);
+    assert(player_iterator_id != NULL); // Because we should have at least one player
+    Player current_player = mapGet(tournament_players, player_iterator_id), max_player_score = current_player;
+    int max_score = playerGetScore(current_player), max_id_score = *player_iterator_id;
+
+    free(player_iterator_id);
+    while((player_iterator_id = mapGetNext(tournament_players)) != NULL)
+    {
+        current_player = mapGet(tournament_players, player_iterator_id);
+        if(max_score == playerGetScore(current_player))
+        {
+            if(sameWinner(max_player_score, max_id_score, current_player, *player_iterator_id))
+            {
+                free(player_iterator_id);
+                break;
+            }
+        }
+        else if(max_score <= playerGetScore(current_player))
+        {
+            max_player_score = current_player;
+            max_score = playerGetScore(current_player);
+            max_id_score = *player_iterator_id;
+        }
+        free(player_iterator_id);       
+    }
+
+    setTournamentWinnerId(this_tournament, max_score);
+    mapDestroy(tournament_players);
+
+    return CHESS_SUCCESS;
 }
 
 double chessCalculateAveragePlayTime(ChessSystem chess, int player_id, ChessResult* chess_result)

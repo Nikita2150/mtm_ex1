@@ -115,3 +115,10 @@ bool tournamentHasEnded(Tournament tournament)
     assert(tournament != NULL);
     return tournamentGetWinnerId(tournament) != TOURNAMENT_IN_PROGRESS;
 }
+
+void setTournamentWinnerId(Tournament tournament, int winner_id)
+{
+    assert(tournament != NULL);
+
+    tournament->winner_id = winner_id;
+}

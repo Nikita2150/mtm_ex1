@@ -19,6 +19,7 @@ void playerAddTime(Player player, int time);
 
 Player playerCopy(Player player);
 
+int playerGetScore(Player player);
 
 int playerGetNumOfGames(Player player);
 int playerGetNumOfWins(Player player);
@@ -34,5 +35,7 @@ int playerGetPlayTime(Player player);
 void playerUpdateRemovedGame(Player player, Winner winner, bool first, int play_time);
 
 void playerSubtractDraw(Player player);
+
+bool sameWinner(Player current_winner, int current_winner_id, Player current_player, int current_player_id);
 
 #endif //_PLAYER_H
