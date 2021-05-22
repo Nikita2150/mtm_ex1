@@ -27,6 +27,11 @@ Tournament tournamentCreate(int max_games_per_player, const char* tournament_loc
     new_tournament->tournament_location = tournament_location;
 
     new_tournament->tournament_players = setCreate();
+    if(new_tournament->tournament_players == NULL)
+    {
+        tournamentDestroy(new_tournament);
+        return NULL;
+    }
     new_tournament->games = NULL; //Empty games node
     return new_tournament;
 }
@@ -56,9 +61,21 @@ MapDataElement tournamentCopy(MapDataElement tournament)
     }
     Tournament this_tournament = (Tournament) tournament;
     Tournament new_tournament = tournamentCreate(this_tournament->max_games_per_player, this_tournament->tournament_location);
+    if(new_tournament == NULL)
+    {
+        return NULL;
+    }
     new_tournament->games = nodeCopy(this_tournament->games);
+    if(new_tournament->games == NULL)
+    {
+        return NULL;
+    }
     new_tournament->winner_id = this_tournament->winner_id;
-    new_tournament->tournament_players = setCopy(this_tournament->tournament_players);//function does not exist in the moment: 22/05/2021 14:51
+    new_tournament->tournament_players = setCopy(this_tournament->tournament_players);
+    if(new_tournament->tournament_players == NULL)
+    {
+        return NULL;
+    }
     return (MapDataElement) new_tournament; //If = NULL, we'll return NULL
 }
 
@@ -73,23 +90,36 @@ bool tournamentContains(Tournament tournament, int first_player, int second_play
 
 MapResult tournamentAddGame(Tournament tournament, int first_player, int second_player, Winner winner, int play_time)
 {
+    
+    
     if(tournament == NULL)
     {
         return MAP_NULL_ARGUMENT;
     }
+    if(setAdd(tournament->tournament_players, first_player) == SET_OUT_OF_MEMORY)
+    {
+        return MAP_OUT_OF_MEMORY;
+    }
+    if(setAdd(tournament->tournament_players, second_player) == SET_OUT_OF_MEMORY)
+    {
+        setRemove(tournament->tournament_players, second_player);
+        return MAP_OUT_OF_MEMORY;
+    }
     Game new_game = gameCreate(first_player, second_player, winner, play_time);
     if(new_game == NULL)
     {
+        setRemove(tournament->tournament_players, first_player);
+        setRemove(tournament->tournament_players, second_player);
         return MAP_OUT_OF_MEMORY;
     }
     Node new_games_list = nodeAdd(tournament->games, new_game);
     if(new_games_list == NULL)
     {
+        setRemove(tournament->tournament_players, first_player);
+        setRemove(tournament->tournament_players, second_player);
         return MAP_OUT_OF_MEMORY;
     }
     tournament->games = new_games_list;
-    setAdd(tournament->tournament_players, first_player);
-    setAdd(tournament->tournament_players, second_player);
     return MAP_SUCCESS;
 }
 
@@ -151,7 +181,6 @@ int tournamentGetNumOfPlayers(Tournament tournament)
 {
     assert(tournament != NULL);
     return setGetSize(tournament->tournament_players);
-  //NOAM IT'S YOUR ZONE, fuck yessssss
 }
 int tournamentGetPlayTime(Tournament tournament)
 {

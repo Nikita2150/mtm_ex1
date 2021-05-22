@@ -50,7 +50,7 @@ Set setCreate()
     {
         return NULL;
     }
-    set->ids = malloc(INITIAL_SIZE * sizeof(int*));
+    set->ids = malloc(INITIAL_SIZE * sizeof(*(set->ids)));
     if (set->ids == NULL) 
     {
         free(set);
@@ -131,16 +131,28 @@ void setDestroy(Set set)
     {
         return;
     }
-    while(setGetSize(set) > 0)
-    {
-    setRemove(set, setGetFirst(set));
-    }
     free(set->ids);
     free(set);
 }
 
-//NEED TO FILL UP
+
 Set setCopy(Set set)
 {
-    return NULL;
+    Set new_set = setCreate();
+    if(new_set == NULL)
+    {
+        return NULL;
+    }
+    int iterator_player_id = setGetFirst(set);
+    while(iterator_player_id != SET_ENDED)
+    {
+        if(setAdd(new_set, iterator_player_id) != SET_SUCCESS)
+        {
+            setDestroy(new_set);
+            return NULL;
+        }
+        iterator_player_id = setGetNext(set);
+    }
+
+    return new_set;
 }

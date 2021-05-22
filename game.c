@@ -82,7 +82,10 @@ int gameGetPlayTime(Game game)
 
 Game gameCopy(Game game)
 {
-    assert(game != NULL);
+    if(game == NULL)
+    {
+        return NULL;
+    }
     Game new_game = malloc(sizeof(*new_game));
     if(new_game == NULL)
     {

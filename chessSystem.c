@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include <string.h>
 #include <assert.h>
 
 #include "chessSystem.h"
@@ -11,6 +12,12 @@
 #include "node.h"
 
 #define ID_AND_LEVEL 2
+
+#define FIRST_CAPITAL_LETTER 'A'
+#define LAST_CAPITAL_LETTER 'Z'
+#define FIRST_SMALL_LETTER 'a'
+#define LAST_SMALL_LETTER 'z'
+#define SPACE_CHAR ' '
 
 
 struct chess_system_t
@@ -87,6 +94,8 @@ static ChessResult convertMapResult(ChessSystem chess, MapResult map_result)
             chessDestroy(chess);
             return CHESS_OUT_OF_MEMORY;
         case MAP_SUCCESS:
+            return CHESS_SUCCESS;
+        default: //Won't happen, but the compiler wants it
             return CHESS_SUCCESS;
     }
     return CHESS_SUCCESS;
@@ -197,7 +206,29 @@ static bool putInArray(int** array, int player_id, int level, int size, int last
     return true;
 
 }
-
+static bool checkValidLocation(const char* location)
+{
+    assert(location != NULL);
+    int length = strlen(location);
+    if(length <= 0)
+    {
+        return false;
+    }
+    if(location[0] < FIRST_CAPITAL_LETTER || location[0] > LAST_CAPITAL_LETTER)
+    {
+        return false;
+    }
+    
+    for(int i = 1; i < length; i++)
+    {
+        if((location[i] < FIRST_SMALL_LETTER || location[i] > LAST_SMALL_LETTER)
+            && location[i] != SPACE_CHAR)
+        {
+            return false;
+        }          
+    }
+    return true;
+}
 
 
 
@@ -227,6 +258,8 @@ void chessDestroy(ChessSystem chess)
     }
 }
 
+
+
 ChessResult chessAddTournament(ChessSystem chess, int tournament_id, int max_games_per_player, const char* tournament_location)
 {
     if(chess == NULL || tournament_location == NULL)
@@ -242,10 +275,10 @@ ChessResult chessAddTournament(ChessSystem chess, int tournament_id, int max_gam
     {
         return CHESS_TOURNAMENT_ALREADY_EXISTS;
     }
-    if(tournament_location == "")//Is this the only empty string?
+    if(!checkValidLocation(tournament_location))
     {
         return CHESS_INVALID_LOCATION;
-    } //should create a function that checks the location!!!
+    }
     if(max_games_per_player <= 0)
     {
         return CHESS_INVALID_MAX_GAMES;
