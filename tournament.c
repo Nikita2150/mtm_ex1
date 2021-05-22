@@ -66,7 +66,7 @@ MapDataElement tournamentCopy(MapDataElement tournament)
         return NULL;
     }
     new_tournament->games = nodeCopy(this_tournament->games);
-    if(new_tournament->games == NULL)
+    if(new_tournament->games == NULL && this_tournament->games != NULL)
     {
         return NULL;
     }

@@ -83,7 +83,7 @@ bool nodeContains(Node node, int first_player, int second_player)
 
 Node nodeAdd(Node list, Game game)
 {
-    assert(list != NULL && game != NULL);
+    assert(game != NULL);
     Node new_node = nodeCreate(game);
     if(new_node == NULL)
     {

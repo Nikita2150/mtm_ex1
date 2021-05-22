@@ -21,14 +21,14 @@ void playerAddTime(Player player, int time);
 
 MapDataElement playerCopy(MapDataElement player);
 
-int playerGetScore(Player player);
+double playerGetScore(Player player);
 
 int playerGetNumOfGames(Player player);
 int playerGetNumOfWins(Player player);
 int playerGetNumOfDraws(Player player);
 int playerGetNumOfLosses(Player player);
 
-int playerGetLevel(Player player);
+double playerGetLevel(Player player);
 
 
 int playerGetPlayTime(Player player);

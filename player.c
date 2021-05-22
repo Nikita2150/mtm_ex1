@@ -129,7 +129,7 @@ void playerUpdateRemovedGame(Player player, Winner winner, bool first, int play_
     }
 }
 
-int playerGetScore(Player player)
+double playerGetScore(Player player)
 {
     assert(player != NULL);
     if(player->num_of_games == 0)
@@ -137,7 +137,7 @@ int playerGetScore(Player player)
         return 0;
     }
     return ((player->num_of_wins * WINS_SCORE_MULTIPLIER + player->num_of_draws * DRAW_SCORE_MULTIPLIER +
-             (playerGetNumOfLosses(player) * LOSSES_SCORE_MULTIPLIER)) / player->num_of_games);
+             (playerGetNumOfLosses(player) * LOSSES_SCORE_MULTIPLIER) * 1.0) / player->num_of_games);
 }
 
 void playerSubtractDraw(Player player)
@@ -171,7 +171,7 @@ int playerGetNumOfLosses(Player player)
     return player->num_of_games - player->num_of_draws - player->num_of_wins;
 }
 
-int playerGetLevel(Player player)
+double playerGetLevel(Player player)
 {
     assert(player!=NULL);
     int x = WINS_LEVEL_MULTIPLIER*playerGetNumOfWins(player) + LOSSES_LEVEL_MULTIPLIER*playerGetNumOfLosses(player) + DRAWS_LEVEL_MULTIPLIER*playerGetNumOfDraws(player);
@@ -180,7 +180,7 @@ int playerGetLevel(Player player)
     {
         return 0;
     }
-    return x/n;
+    return (x*1.0)/n;
 }
 
 bool sameWinner(Player current_winner, int current_winner_id, Player current_player, int current_player_id)
