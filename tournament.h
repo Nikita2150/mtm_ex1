@@ -20,7 +20,8 @@ void tournamentFree(MapDataElement tournament);
 
 MapDataElement tournamentCopy(MapDataElement tournament);
 
-MapResult tournamentAddGame(Tournament tournament, int first_player, int second_player, Winner winner, int play_time);
+MapResult tournamentAddGame(Tournament tournament, int first_player, int second_player, Winner winner, int play_time,
+                            bool new_first_player, bool new_second_player);
 
 int tournamentGetMaxGamesPerPlayer(Tournament tournament);
 
@@ -40,4 +41,6 @@ int tournamentGetPlayTime(Tournament tournament);
 double tournamentGetAveragePlayTime(Tournament tournament);
 
 void tournamentSetWinnerId(Tournament tournament, int winner_id);
+
+bool tournamentExceededGames(Tournament tournament, int player_id);
 #endif

@@ -67,65 +67,73 @@ MapDataElement playerCopy(MapDataElement player)
     {
         return NULL;
     }
-    
+
     new_player->num_of_draws = this_player->num_of_draws;
     new_player->num_of_games = this_player->num_of_games;
     new_player->num_of_wins = this_player->num_of_wins;
     new_player->play_time = this_player->play_time;
 
-    return (MapDataElement) new_player;    
+    return (MapDataElement) new_player;
 }
 
 
 void playerAddGame(Player player)
 {
-    assert(player!=NULL);
-    player->num_of_games++;
+    if(player != NULL)
+    {
+        player->num_of_games++;
+    }
 }
 
 void playerAddWin(Player player)
 {
-    assert(player!=NULL);
-    player->num_of_wins++;
+    if(player != NULL)
+    {
+        player->num_of_wins++;
+
+    }
 }
 
 void playerAddDraw(Player player)
 {
-    assert(player!=NULL);
-    player->num_of_draws++;
-    
+    if(player != NULL)
+    {
+        player->num_of_draws++;
+    }
+
 }
 
 void playerAddTime(Player player, int time)
 {
-    assert(player!=NULL);
-    player->play_time += time;
-    
+    if(player != NULL)
+    {
+        player->play_time += time;
+    }
+
 }
 
 int playerGetNumOfGames(Player player)
 {
     assert(player!=NULL);
     return player->num_of_games;
-    
+
 }
 
 void playerUpdateRemovedGame(Player player, Winner winner, bool first, int play_time)
 {
-    assert(player!=NULL);
-    player->num_of_games--;
-    player->play_time -= play_time;
-    if(winner == DRAW)
+    if(player != NULL)
     {
-        player->num_of_draws--;
-    }
-    else if(winner == FIRST_PLAYER && first)
-    {
-        player->num_of_wins--;
-    }
-    else if(winner == SECOND_PLAYER && !first)
-    {
-        player->num_of_wins--;
+        player->num_of_games--;
+        player->play_time -= play_time;
+        if (winner == DRAW) {
+            player->num_of_draws--;
+        } else if (winner == FIRST_PLAYER && first)
+        {
+            player->num_of_wins--;
+        } else if (winner == SECOND_PLAYER && !first)
+        {
+            player->num_of_wins--;
+        }
     }
 }
 
@@ -136,21 +144,25 @@ double playerGetScore(Player player)
     {
         return 0;
     }
+    int devide_by = player->num_of_games;
+    devide_by = 1; // NOT SURE, info in .h and in .pdf is different
     return ((player->num_of_wins * WINS_SCORE_MULTIPLIER + player->num_of_draws * DRAW_SCORE_MULTIPLIER +
-             (playerGetNumOfLosses(player) * LOSSES_SCORE_MULTIPLIER) * 1.0) / player->num_of_games);
+             (playerGetNumOfLosses(player) * LOSSES_SCORE_MULTIPLIER) * 1.0) / devide_by);
 }
 
 void playerSubtractDraw(Player player)
 {
-    assert(player!=NULL);
-    player->num_of_draws--;
-    
+    if(player != NULL) {
+
+        player->num_of_draws--;
+    }
+
 }
 
 int playerGetPlayTime(Player player)
 {
     assert(player!=NULL);
-    return player->num_of_games;
+    return player->play_time;
 }
 
 int playerGetNumOfWins(Player player)
