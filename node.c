@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "node.h"
+#include "map.h"
+#include "chessSystem.h"
 
 
 struct node_t
@@ -22,48 +24,12 @@ Node nodeCreate(Game game)
     return new_node;
 }
 
-Game nodeGetGame(Node node)
-{
-    if(node == NULL)
-    {
-        return NULL;
-    }
-    return node->game;
-}
-
-void nodeSetGame(Node node, Game game)
-{
-    if(node != NULL)
-    {
-         node->game = game;
-    }
-}
-
-Node nodeGetNext(Node node)
-{
-    if(node == NULL)
-    {
-        return NULL;
-    }
-    return node->next;
-}
-
-void nodeSetNext(Node node, Node to_set_next)
-{
-    if(node != NULL)
-    {
-        node->next = to_set_next;
-    }
-}
 
 void nodeDestroy(Node node)
 {
     while(node != NULL)
     {
-        Node toDelete = node;
-        node = node->next;
-        gameDestroy(toDelete->game);
-        free(toDelete);
+        node = removeFirstNode(node);
     }
 }
 
@@ -71,8 +37,7 @@ bool nodeContains(Node node, int first_player, int second_player)
 {
     while(node != NULL)
     {
-        if(gameGetFirstPlayer(node->game) == first_player &&
-         gameGetSecondPlayer(node->game) == second_player)
+        if(gameContains(node->game, first_player, second_player))
         {
             return true;
         }
@@ -194,4 +159,70 @@ double nodeGetAveragePlayTime(Node list)
     }
 
     return (nodeGetTotalPlayTime(list) * 1.0) / nodeGetSize(list);
+}
+
+void nodeAreNewPlayers(Node games, int first_player, int second_player, bool* new_first_player, 
+                        bool* new_second_player)
+{
+    while(games != NULL)
+	{
+		gameAreNewPlayers(games->game, first_player, second_player, new_first_player, new_second_player);
+        games = games->next;
+	}
+}
+
+void nodeUpdateWhenRemovingPlayer(Map players, Node games, int current_player_id)
+{
+    while(games != NULL)
+    {
+        Game current_game = games->game;
+        gameUpdateWhenRemovingPlayer(players, current_game, current_player_id);
+        games = games->next;
+    }
+}
+
+NodeResult nodeGetTournamentPlayersMap(Node games, Map tournament_players)
+{
+    while(games != NULL)
+    {
+        if(gameAddPlayersToMap(games->game, tournament_players) != GAME_SUCCESS)
+        {
+            return NODE_OUT_OF_MEMORY;
+        }
+        games = games->next;
+    }
+    return NODE_SUCCESS;
+}
+
+void nodeTournamentRemoveUpdatePlayers(Node node, Map players)
+{
+    while(node != NULL)
+    {
+        gameTournamentRemoveUpdatePlayers(node->game, players);
+        node = node->next;
+    }
+}
+
+int nodeCountPlayerAppearances(Node games, int player_id)
+{
+    int count = 0;
+    while(games != NULL)
+    {
+        Game current_game = games->game;
+        if(gamePlayerIsPlaying(current_game, player_id))
+        {
+            count++;
+        }
+        games = games->next;
+    }
+    return count;
+}
+
+void nodeUpdateRemovedPlayersAfterEnd(Node games, int player_id)
+{
+	while(games != NULL)
+	{
+		gameUpdateRemovedPlayersAfterEnd(games->game, player_id);
+		games = games->next;
+	}
 }

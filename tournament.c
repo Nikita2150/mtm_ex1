@@ -2,7 +2,7 @@
 #include "tournament.h"
 #include "node.h"
 #include "map.h"
-
+#include "player.h"
 
 
 struct tournament_t
@@ -38,34 +38,28 @@ void tournamentDestroy(Tournament tournament)
         free(tournament);
     }
 }
-void tournamentFree(MapDataElement tournament)
-{
-    if(tournament != NULL)
-    {
-        tournamentDestroy((Tournament) tournament);
-    }
-}
 
-MapDataElement tournamentCopy(MapDataElement tournament)
+Tournament tournamentCopy(Tournament tournament)
 {
     if(tournament == NULL)
     {
         return NULL;
     }
-    Tournament this_tournament = (Tournament) tournament;
-    Tournament new_tournament = tournamentCreate(this_tournament->max_games_per_player, this_tournament->tournament_location);
+
+    Tournament new_tournament = tournamentCreate(tournament->max_games_per_player,
+												 tournament->tournament_location);
     if(new_tournament == NULL)
     {
         return NULL;
     }
-    new_tournament->games = nodeCopy(this_tournament->games);
-    if(new_tournament->games == NULL && this_tournament->games != NULL)
+    new_tournament->games = nodeCopy(tournament->games);
+    if(new_tournament->games == NULL && tournament->games != NULL)
     {
         return NULL;
     }
-    new_tournament->winner_id = this_tournament->winner_id;
-    new_tournament->num_of_tournament_players = this_tournament->num_of_tournament_players;
-    return (MapDataElement) new_tournament; //If = NULL, we'll return NULL
+    new_tournament->winner_id = tournament->winner_id;
+    new_tournament->num_of_tournament_players = tournament->num_of_tournament_players;
+    return new_tournament; //If = NULL, we'll return NULL
 }
 
 bool tournamentContains(Tournament tournament, int first_player, int second_player)
@@ -77,73 +71,30 @@ bool tournamentContains(Tournament tournament, int first_player, int second_play
     return nodeContains(tournament->games, first_player, second_player);
 }
 
-MapResult tournamentAddGame(Tournament tournament, int first_player, int second_player, Winner winner, int play_time,
-                            bool new_first_player, bool new_second_player)
+TournamentResult tournamentAddGame(Tournament tournament,Game new_game, bool new_first_player, bool new_second_player)
 {
-    if(tournament == NULL)
-    {
-        return MAP_NULL_ARGUMENT;
-    }
-    //For readabilty: 
-    int new_first_player_val = (new_first_player) ? 1 : 0, new_second_player_val = (new_second_player) ? 1 : 0;
+	assert(new_game != NULL && tournament != NULL);
+
+    //For readability:
+    int new_first_player_val = (new_first_player) ? 1 : 0, new_second_player_val =(new_second_player) ? 1 : 0;
 
     tournament->num_of_tournament_players += new_first_player_val + new_second_player_val;
-    Game new_game = gameCreate(first_player, second_player, winner, play_time);
-    if(new_game == NULL)
-    {
-        return MAP_OUT_OF_MEMORY;
-    }
+
     Node new_games_list = nodeAdd(tournament->games, new_game);
     if(new_games_list == NULL)
     {
-        return MAP_OUT_OF_MEMORY;
+        return TOURNAMENT_OUT_OF_MEMORY;
     }
     tournament->games = new_games_list;
-    return MAP_SUCCESS;
+    return TOURNAMENT_SUCCESS;
 }
 
-int tournamentGetMaxGamesPerPlayer(Tournament tournament)
-{
-    if(tournament == NULL)
-    {
-        return -1;
-    }
-    return tournament->max_games_per_player;
-}
 
-Node tournamentGetGames(Tournament tournament)
-{
-    if(tournament == NULL)
-    {
-        return NULL;
-    }
-    return tournament->games;
-}
-
-void tournamentRemoveFirstGame(Tournament tournament)
-{
-    if(tournament != NULL)
-    {
-        tournament->games = removeFirstNode(tournament->games);
-    }
-}
-
-int tournamentGetWinnerId(Tournament tournament)
-{
-    assert(tournament != NULL);
-    return tournament->winner_id;
-}
 
 bool tournamentHasEnded(Tournament tournament)
 {
     assert(tournament != NULL);
-    return tournamentGetWinnerId(tournament) != TOURNAMENT_IN_PROGRESS;
-}
-
-const char* tournamentGetLocation(Tournament tournament)
-{
-    assert(tournament != NULL);
-    return tournament->tournament_location;
+    return tournament->winner_id != TOURNAMENT_IN_PROGRESS;
 }
 
 int tournamentGetLongestPlayTime(Tournament tournament)
@@ -156,11 +107,6 @@ int tournamentGetNumOfGames(Tournament tournament)
     assert(tournament != NULL);
     return nodeGetSize(tournament->games);
 }
-int tournamentGetNumOfPlayers(Tournament tournament)
-{
-    assert(tournament != NULL);
-    return tournament->num_of_tournament_players;
-}
 int tournamentGetPlayTime(Tournament tournament)
 {
     assert(tournament != NULL);
@@ -172,29 +118,98 @@ double tournamentGetAveragePlayTime(Tournament tournament)
     return nodeGetAveragePlayTime(tournament->games);
 }
 
-void tournamentSetWinnerId(Tournament tournament, int winner_id)
-{
-    assert(tournament != NULL);
 
-    tournament->winner_id = winner_id;
-}
-
-bool tournamentExceededGames(Tournament tournament, int player_id)
+bool tournamentPlayersExceededGames(Tournament tournament, int player_id_one, int player_id_two)
 {
     if(tournament == NULL)
     {
         return false;
     }
-    int counter = 0;
+    
     Node games_list = tournament->games;
-    while(games_list != NULL)
+
+    int counter_one = nodeCountPlayerAppearances(games_list, player_id_one);
+    int counter_two = nodeCountPlayerAppearances(games_list, player_id_two);
+    return counter_one >= tournament->max_games_per_player || counter_two >= tournament->max_games_per_player;
+}
+
+void tournamentAreNewPlayers(Tournament tournament, int first_player, int second_player, bool* new_first_player,
+							 bool* new_second_player)
+{
+    assert(tournament!=NULL);
+    nodeAreNewPlayers(tournament->games, first_player, second_player, new_first_player, new_second_player);
+}
+
+void tournamentUpdateWhenRemovingPlayer(Map players, Tournament tournament, int current_player_id)
+{
+	assert(tournament != NULL);
+	Node game_iterator = tournament->games;
+	if(game_iterator == NULL)
+	{
+		return;
+	}
+    if(tournament->winner_id == TOURNAMENT_IN_PROGRESS)
     {
-        Game current_game = nodeGetGame(games_list);
-        if(gameGetFirstPlayer(current_game) == player_id || gameGetSecondPlayer(current_game) == player_id)
-        {
-            counter++;
-        }
-        games_list = nodeGetNext(games_list);
+        nodeUpdateWhenRemovingPlayer(players, game_iterator, current_player_id);
     }
-    return counter >= tournament->max_games_per_player;
+    else
+    {
+	    nodeUpdateRemovedPlayersAfterEnd(game_iterator, current_player_id);
+    }
+}
+
+TournamentResult tournamentGetPlayersMap(Tournament tournament, Map tournament_players)
+{
+    if(tournament != NULL)
+    {
+        if(nodeGetTournamentPlayersMap(tournament->games, tournament_players) != NODE_SUCCESS)
+        {
+            return TOURNAMENT_OUT_OF_MEMORY;
+        }
+    }
+    return TOURNAMENT_SUCCESS;
+}
+
+void tournamentRemoveUpdatePlayers(Tournament tournament, Map players)
+{
+    if(tournament != NULL)
+    {
+        nodeTournamentRemoveUpdatePlayers(tournament->games , players);
+    }
+}
+
+void tournamentCalculateWinner(Tournament tournament, Map players)
+{
+    assert(tournament != NULL && players != NULL);
+
+    int* player_iterator_id = mapGetFirst(players);
+    //The player exists, we checked
+    Player current_player = mapGet(players, player_iterator_id), max_player_score = current_player;
+    int max_score = playerGetScore(current_player), max_id_score = *player_iterator_id;
+    free(player_iterator_id);
+
+    while((player_iterator_id = mapGetNext(players)) != NULL)
+    {
+        current_player = mapGet(players, player_iterator_id);
+        assert(current_player != NULL);
+        if((max_score < playerGetScore(current_player)) || (max_score == playerGetScore(current_player) &&
+                !sameWinner(max_player_score, max_id_score, current_player, *player_iterator_id)))
+        {
+            max_player_score = current_player;
+            max_score = playerGetScore(current_player);
+            max_id_score = *player_iterator_id;
+        }
+        free(player_iterator_id);
+    }
+
+    tournament->winner_id = max_id_score;
+}
+
+bool tournamentPrintStatistics(Tournament tournament, FILE* stream)
+{
+    assert(stream != NULL);
+    return fprintf(stream, "%d\n%d\n%.2f\n%s\n%d\n%d\n", tournament->winner_id,
+              tournamentGetLongestPlayTime(tournament), tournamentGetAveragePlayTime(tournament),
+              tournament->tournament_location,tournamentGetNumOfGames(tournament),
+              tournament->num_of_tournament_players) != EOF;
 }
